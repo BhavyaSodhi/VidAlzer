@@ -1,0 +1,2319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VidAlzer - AI-Powered Educational Content Analysis & Study Companion Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#EEF2FF',
+              100: '#E0E7FF',
+              200: '#C7D2FE',
+              300: '#A5B4FC',
+              400: '#818CF8',
+              500: '#6366F1',
+              600: '#4F46E5',
+              700: '#4338CA',
+              800: '#3730A3',
+              900: '#312E81',
+              navy: '#10164A',
+              subtext: '#5A6785',
+              bglight: '#F8FAFF',
+              cardborder: '#E2E8F5',
+              accentgold: '#F59E0B',
+              accentgreen: '#10B981',
+              accentcyan: '#0EA5E9',
+              accentorange: '#F97316',
+              accentpurple: '#8B5CF6'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          boxShadow: {
+            'card': '0 4px 20px -2px rgba(79, 70, 229, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04)',
+            'card-hover': '0 12px 30px -3px rgba(79, 70, 229, 0.14), 0 6px 12px -2px rgba(0, 0, 0, 0.06)',
+            'brand': '0 4px 14px 0 rgba(79, 70, 229, 0.38)',
+            'subtle': '0 1px 3px 0 rgba(0, 0, 0, 0.05)'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #F8FAFF;
+      color: #10164A;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #F1F5F9;
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+    .bg-brand-gradient {
+      background: linear-gradient(135deg, #4F46E5 0%, #6366F1 50%, #4338CA 100%);
+    }
+    .text-brand-gradient {
+      background: linear-gradient(135deg, #3730A3 0%, #4F46E5 50%, #6366F1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .page-view {
+      display: none;
+      min-height: calc(100vh - 80px);
+      width: 100%;
+    }
+    .page-view.active {
+      display: block;
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .badge-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 12px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+  </style>
+</head>
+<body class="bg-[#F8FAFF] text-[#10164A] flex flex-col min-h-screen">
+
+  <!-- ========================================================================= -->
+  <!-- EXACT REDESIGNED NAVBAR MATCHING USER'S REFERENCE IMAGE                    -->
+  <!-- ========================================================================= -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#E2E8F5] shadow-subtle">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
+      
+      <!-- Left: Logo & Main Navigation Links -->
+      <div class="flex items-center gap-7 lg:gap-9">
+        <!-- VidAlzer Logo -->
+        <div class="flex items-center gap-2.5 cursor-pointer" onclick="navigateTo('landing')">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#6366F1] to-[#7C3AED] flex items-center justify-center shadow-brand text-white flex-shrink-0">
+            <svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+          <span class="text-xl font-black tracking-tight text-[#10164A]">Vid<span class="text-[#4F46E5]">Alzer</span></span>
+        </div>
+
+        <!-- Links: Home, Features, How It Works, History -->
+        <nav class="hidden md:flex items-center gap-6 lg:gap-7 text-xs font-semibold">
+          <button onclick="navigateTo('landing')" id="nav-item-home" class="text-[#10164A] font-bold pb-0.5 border-b-2 border-[#4F46E5] transition-all">
+            Home
+          </button>
+          
+          <!-- Features with Dropdown & Direct Click to Study Tools -->
+          <div class="relative group">
+            <button onclick="navigateTo('workspace')" id="nav-item-features" class="text-slate-600 hover:text-[#10164A] flex items-center gap-1 transition-all py-1">
+              <span>Features</span>
+              <svg class="w-3 h-3 text-slate-400 group-hover:text-slate-700 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <!-- Dropdown Menu displaying all the study views -->
+            <div class="absolute left-0 top-full mt-1 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 hidden group-hover:block transition-all z-50">
+              <button onclick="navigateTo('workspace')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[#10164A] hover:bg-indigo-50 hover:text-[#4F46E5] flex items-center gap-2.5 transition-colors">
+                <span class="text-sm">📝</span>
+                <div>
+                  <div>Study Workspace</div>
+                  <div class="text-[10px] text-slate-400 font-normal">AI Notes & Video Player</div>
+                </div>
+              </button>
+              <button onclick="navigateTo('exam')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[#10164A] hover:bg-indigo-50 hover:text-[#4F46E5] flex items-center gap-2.5 transition-colors">
+                <span class="text-sm">🎯</span>
+                <div>
+                  <div>Exam & Practice</div>
+                  <div class="text-[10px] text-slate-400 font-normal">Quizzes, PYQs & GATE/NET</div>
+                </div>
+              </button>
+              <button onclick="navigateTo('mindmap')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[#10164A] hover:bg-indigo-50 hover:text-[#4F46E5] flex items-center gap-2.5 transition-colors">
+                <span class="text-sm">🧠</span>
+                <div>
+                  <div>Visual Mind Map</div>
+                  <div class="text-[10px] text-slate-400 font-normal">Interactive Node Hierarchy</div>
+                </div>
+              </button>
+              <button onclick="navigateTo('resources')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[#10164A] hover:bg-indigo-50 hover:text-[#4F46E5] flex items-center gap-2.5 transition-colors">
+                <span class="text-sm">📚</span>
+                <div>
+                  <div>Learning Resources</div>
+                  <div class="text-[10px] text-slate-400 font-normal">Textbooks & Research Papers</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- How It Works -> Generation Pipeline & AI Demo -->
+          <button onclick="navigateTo('progress')" id="nav-item-howitworks" class="text-slate-600 hover:text-[#10164A] transition-all">
+            How It Works
+          </button>
+
+          <!-- History -> Search Results & Video Catalog -->
+          <button onclick="navigateTo('search')" id="nav-item-history" class="text-slate-600 hover:text-[#10164A] transition-all">
+            History
+          </button>
+        </nav>
+      </div>
+
+      <!-- Center: Search Bar with ⌘ K Shortcut Badge -->
+      <div class="hidden sm:flex items-center flex-1 max-w-sm lg:max-w-md mx-3">
+        <div class="relative w-full">
+          <div class="absolute left-3.5 top-2.5 text-slate-400">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <input id="nav-search-input" onkeydown="handleNavSearch(event)" type="text" placeholder="Search topics, videos or anything..." class="w-full pl-9 pr-14 py-2 bg-[#F8FAFF] hover:bg-white focus:bg-white border border-[#E2E8F5] focus:border-[#4F46E5] rounded-full text-xs text-[#10164A] placeholder-slate-400 focus:outline-none shadow-subtle transition-all">
+          <div class="absolute right-3 top-2 px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-mono text-slate-400 flex items-center gap-0.5 shadow-xs pointer-events-none">
+            <span>⌘</span><span>K</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Sun Toggle, Bell with Badge '2', User Profile 'PV' -->
+      <div class="flex items-center gap-3.5 flex-shrink-0">
+        
+        <!-- Sun Icon (Theme Toggle) -->
+        <button onclick="showToast('Theme switched to Light mode ☀️')" class="w-8 h-8 rounded-full flex items-center justify-center text-amber-500 hover:bg-amber-50 text-base transition-colors" title="Toggle theme">
+          ☀️
+        </button>
+
+        <!-- Notification Bell with Red Badge '2' -->
+        <button onclick="showToast('Notifications: 2 new study kits generated! 🔔')" class="relative w-8 h-8 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors" title="Notifications">
+          <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          <!-- Red Circular Badge with '2' -->
+          <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-xs">
+            2
+          </span>
+        </button>
+
+        <!-- User Profile Avatar (Solid Blue Circle with 'PV') -->
+        <div onclick="showToast('Signed in as: Priya Verma (PV) 👤')" class="w-8 h-8 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-xs flex items-center justify-center shadow-subtle cursor-pointer transition-colors" title="User Profile: Priya Verma">
+          PV
+        </div>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN ROUTER CONTAINER (EACH SCREEN IS A FULL PAGE COVERING 100% SCREEN)   -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 w-full">
+
+    <!-- ======================================================================= -->
+    <!-- PAGE 1: FULL LANDING PAGE                                               -->
+    <!-- ======================================================================= -->
+    <div id="page-landing" class="page-view active w-full">
+
+      <!-- Unified Full-Width Hero Banner Container — EDGE TO EDGE, NO OUTER PADDING -->
+      <div class="relative w-full min-h-[500px] lg:min-h-[560px] overflow-hidden bg-[#DEE4FE] flex items-center">
+        
+        <!-- Full-Width Background Banner Image -->
+        <img src="hero-banner.jpg" alt="VidAlzer Hero Banner" class="absolute inset-0 w-full h-full object-cover object-right pointer-events-none select-none">
+
+        <!-- Left-Side Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-r from-[#DEE4FE]/95 via-[#DEE4FE]/85 to-transparent w-full md:w-3/4 lg:w-3/5 pointer-events-none"></div>
+
+        <!-- Left-Side Content -->
+        <div class="relative z-10 w-full max-w-xl lg:max-w-2xl px-8 sm:px-14 lg:px-20 py-14 space-y-6">
+            
+            <div class="space-y-3">
+              <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/80 backdrop-blur-sm border border-indigo-200/80 text-[#4F46E5] text-xs font-bold shadow-subtle">
+                <span>⚡</span> AI-Powered Educational Content Analysis
+              </span>
+              <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[#10164A] leading-[1.15]">
+                Turn YouTube Videos <br>
+                <span class="text-brand-gradient">
+                  Into Your Personal <br>Study Kit
+                </span>
+              </h1>
+              <p class="text-sm sm:text-base text-[#334155] font-medium leading-relaxed max-w-lg">
+                Get AI-powered video ratings and generate comprehensive study materials in seconds.
+              </p>
+            </div>
+
+            <!-- Dual Search Box Card sitting directly over the banner -->
+            <div class="p-4 sm:p-5 bg-white/95 backdrop-blur-md rounded-2xl border border-white/80 shadow-card space-y-4">
+              
+              <!-- Tab Switcher -->
+              <div class="inline-flex p-1 bg-[#EEF2FF] rounded-full gap-1">
+                <button id="p1-tab-topic" onclick="setLandingInputMode('topic')" class="px-5 py-2 rounded-full text-xs sm:text-sm font-semibold bg-[#4F46E5] text-white shadow-sm transition-all">
+                  Search a Topic
+                </button>
+                <button id="p1-tab-url" onclick="setLandingInputMode('url')" class="px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#5A6785] hover:text-[#10164A] transition-all">
+                  Paste YouTube Link
+                </button>
+              </div>
+
+              <!-- Topic Search Mode -->
+              <div id="p1-topic-box" class="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <div class="relative flex-1">
+                  <div class="absolute left-4 top-3.5 text-slate-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                  </div>
+                  <input id="landing-search-query" type="text" value="Operating Systems – Deadlocks" placeholder="e.g. Operating Systems – Deadlocks, Binary Search Trees..." class="w-full pl-12 pr-4 py-3 bg-white border border-[#CBD5E1] rounded-full text-sm text-[#10164A] font-medium focus:outline-none focus:border-[#4F46E5] shadow-sm">
+                </div>
+                <button onclick="handleExecuteTopicSearch()" class="px-7 py-3 bg-gradient-to-r from-[#4F46E5] to-[#6366F1] text-white text-sm font-bold rounded-full shadow-brand hover:opacity-95 flex items-center justify-center gap-2 whitespace-nowrap">
+                  <span>Find Best Videos</span>
+                  <span class="text-base">→</span>
+                </button>
+              </div>
+
+              <!-- YouTube Link Mode -->
+              <div id="p1-url-box" class="hidden relative flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <div class="relative flex-1">
+                  <div class="absolute left-4 top-3.5 text-slate-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                  </div>
+                  <input id="landing-url-query" onkeydown="if(event.key==='Enter') handleExecuteUrlGenerate();" type="text" value="https://www.youtube.com/watch?v=9Jry5-82I68" placeholder="https://www.youtube.com/watch?v=..." class="w-full pl-12 pr-4 py-3 bg-white border border-[#CBD5E1] rounded-full text-sm text-[#10164A] font-medium focus:outline-none focus:border-[#4F46E5] shadow-sm">
+                </div>
+                <button onclick="handleExecuteUrlGenerate()" class="px-7 py-3 bg-gradient-to-r from-[#4F46E5] to-[#6366F1] text-white text-sm font-bold rounded-full shadow-brand hover:opacity-95 flex items-center justify-center gap-2 whitespace-nowrap">
+                  <span>Generate Study Kit</span>
+                  <span class="text-base">→</span>
+                </button>
+              </div>
+
+              <!-- Quick Search Suggestions -->
+              <div class="flex items-center gap-2 flex-wrap text-xs text-slate-600 pt-1">
+                <span class="font-bold text-slate-800">Popular:</span>
+                <button onclick="setQueryAndSearch('Operating Systems – Deadlocks')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-indigo-50 hover:text-[#4F46E5] font-medium transition-colors">Operating Systems – Deadlocks</button>
+                <button onclick="setQueryAndSearch('Binary Search Trees Traversal')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-indigo-50 hover:text-[#4F46E5] font-medium transition-colors">Binary Search Trees</button>
+                <button onclick="setQueryAndSearch('Computer Networks OSI Model')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-indigo-50 hover:text-[#4F46E5] font-medium transition-colors">OSI Model</button>
+              </div>
+
+            </div>
+
+          </div>
+
+      </div>
+
+      <!-- Rest of Landing Page content inside a contained wrapper -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- 5 Feature Cards Section (Full Width, Spacious) -->
+        <div class="space-y-6">
+          <div class="text-center space-y-1">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-[#10164A]">Powerful AI Study Features</h2>
+            <p class="text-sm text-[#5A6785]">Everything you need to learn faster, retain deeper, and prepare for exams</p>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            
+            <div onclick="navigateTo('search')" class="p-5 bg-white rounded-2xl border border-[#E2E8F5] shadow-subtle hover:shadow-card hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center text-center group">
+              <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+                ⭐
+              </div>
+              <h3 class="text-sm font-extrabold text-[#10164A] mb-1">AI Video Ratings</h3>
+              <p class="text-[11px] text-[#5A6785] leading-relaxed">Multi-metric quality ranking out of 5 stars</p>
+            </div>
+
+            <div onclick="navigateTo('workspace')" class="p-5 bg-white rounded-2xl border border-[#E2E8F5] shadow-subtle hover:shadow-card hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center text-center group">
+              <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+                📑
+              </div>
+              <h3 class="text-sm font-extrabold text-[#10164A] mb-1">Smart Notes</h3>
+              <p class="text-[11px] text-[#5A6785] leading-relaxed">Short, detailed, and structured textbook notes</p>
+            </div>
+
+            <div onclick="navigateTo('exam')" class="p-5 bg-white rounded-2xl border border-[#E2E8F5] shadow-subtle hover:shadow-card hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center text-center group">
+              <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+                🏆
+              </div>
+              <h3 class="text-sm font-extrabold text-[#10164A] mb-1">Exam Practice</h3>
+              <p class="text-[11px] text-[#5A6785] leading-relaxed">PYQs, Question Banks &amp; GATE/NET sets</p>
+            </div>
+
+            <div onclick="navigateTo('mindmap')" class="p-5 bg-white rounded-2xl border border-[#E2E8F5] shadow-subtle hover:shadow-card hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center text-center group">
+              <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+                🧠
+              </div>
+              <h3 class="text-sm font-extrabold text-[#10164A] mb-1">Visual Mind Maps</h3>
+              <p class="text-[11px] text-[#5A6785] leading-relaxed">Interactive hierarchical concept tree graphs</p>
+            </div>
+
+            <div onclick="navigateTo('workspace')" class="p-5 bg-white rounded-2xl border border-[#E2E8F5] shadow-subtle hover:shadow-card hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center text-center group">
+              <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+                📥
+              </div>
+              <h3 class="text-sm font-extrabold text-[#10164A] mb-1">Export Study Kits</h3>
+              <p class="text-[11px] text-[#5A6785] leading-relaxed">One-click PDF, markdown, and text download</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- "How It Works?" Section (3 Steps) -->
+        <div class="p-8 sm:p-10 bg-white rounded-3xl border border-[#E2E8F5] shadow-card text-center space-y-8">
+          <div class="space-y-1">
+            <h3 class="text-2xl font-extrabold text-[#10164A]">How It Works?</h3>
+            <p class="text-sm text-[#5A6785]">Three simple steps to transform passive video watching into active mastery</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            
+            <div class="flex flex-col items-center text-center space-y-3 px-4">
+              <div class="w-12 h-12 rounded-full bg-[#4F46E5] text-white text-lg font-bold flex items-center justify-center shadow-brand">
+                1
+              </div>
+              <h4 class="text-base font-extrabold text-[#10164A]">Search a Topic or Paste Link</h4>
+              <p class="text-xs text-[#5A6785] leading-relaxed">Type any academic topic to discover top-rated videos or paste any YouTube lecture link directly.</p>
+            </div>
+
+            <div class="flex flex-col items-center text-center space-y-3 px-4">
+              <div class="w-12 h-12 rounded-full bg-[#4F46E5] text-white text-lg font-bold flex items-center justify-center shadow-brand">
+                2
+              </div>
+              <h4 class="text-base font-extrabold text-[#10164A]">Get Ratings &amp; Generate Kit</h4>
+              <p class="text-xs text-[#5A6785] leading-relaxed">AI analyzes comment sentiments, content depth &amp; transcribes audio to synthesize 11 comprehensive study materials.</p>
+            </div>
+
+            <div class="flex flex-col items-center text-center space-y-3 px-4">
+              <div class="w-12 h-12 rounded-full bg-[#4F46E5] text-white text-lg font-bold flex items-center justify-center shadow-brand">
+                3
+              </div>
+              <h4 class="text-base font-extrabold text-[#10164A]">Learn Better &amp; Ace Your Exams</h4>
+              <p class="text-xs text-[#5A6785] leading-relaxed">Study with short notes, practice previous year exam questions, explore visual mind maps, and export to PDF.</p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ======================================================================= -->
+    <!-- PAGE 2: FULL SEARCH RESULTS & RATING PAGE                              -->
+    <!-- ======================================================================= -->
+    <div id="page-search" class="page-view w-full">
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        
+        <!-- Breadcrumbs -->
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+          <button onclick="navigateTo('landing')" class="hover:text-[#4F46E5] flex items-center gap-1 font-medium">
+            <span>🏠</span> Home
+          </button>
+          <span>&gt;</span>
+          <span class="text-slate-800 font-semibold">Search Results</span>
+        </div>
+
+        <!-- Search Results Header & Filter Bar -->
+        <div class="p-6 bg-white rounded-2xl border border-[#E2E8F5] shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
+          
+          <div>
+            <h2 id="p2-topic-title" class="text-2xl font-black text-[#10164A] tracking-tight">Top videos for Operating System – Deadlocks</h2>
+            <p id="p2-results-count" class="text-xs text-slate-500 mt-1">5 best results ranked by AI Quality &amp; Community Sentiment</p>
+          </div>
+
+          <!-- Search Again & Sort Filters -->
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="relative">
+              <input id="p2-search-input" onkeydown="if(event.key==='Enter' && this.value.trim()){fetchRealVideos(this.value.trim());}" type="text" placeholder="Search another topic..." class="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-xs text-[#10164A] w-52 focus:outline-none focus:border-[#4F46E5]">
+              <svg class="w-4 h-4 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+
+            <!-- Sort Pills -->
+            <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-full text-xs">
+              <button onclick="sortVideoResults('rating')" id="sort-btn-rating" class="px-3.5 py-1 rounded-full bg-[#4F46E5] text-white font-semibold flex items-center gap-1 shadow-sm">
+                <span>AI Rating</span>
+                <span>↓</span>
+              </button>
+              <button onclick="sortVideoResults('views')" id="sort-btn-views" class="px-3 py-1 rounded-full text-slate-600 hover:text-slate-900 font-medium">
+                Most Viewed
+              </button>
+              <button onclick="sortVideoResults('newest')" id="sort-btn-newest" class="px-3 py-1 rounded-full text-slate-600 hover:text-slate-900 font-medium">
+                Newest
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Ranked Video Cards List -->
+        <div id="full-video-cards-container" class="space-y-4">
+          <!-- Populated by JavaScript -->
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ======================================================================= -->
+    <!-- PAGE 3: FULL STUDY WORKSPACE – NOTES                                    -->
+    <!-- ======================================================================= -->
+    <div id="page-workspace" class="page-view w-full">
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        
+        <!-- Breadcrumbs -->
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+          <button onclick="navigateTo('landing')" class="hover:text-[#4F46E5] flex items-center gap-1 font-medium">Home</button>
+          <span>&gt;</span>
+          <button onclick="navigateTo('search')" class="hover:text-[#4F46E5] font-medium">Search Results</button>
+          <span>&gt;</span>
+          <span class="text-slate-800 font-semibold">Study Workspace</span>
+        </div>
+
+        <!-- Title Row with Play Icon & Save/Share -->
+        <div class="p-5 bg-white rounded-2xl border border-[#E2E8F5] shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#7C3AED] text-white flex items-center justify-center shadow-brand flex-shrink-0">
+              <svg class="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div>
+              <h2 id="p3-video-title" class="text-xl sm:text-2xl font-black text-[#10164A]">Binary Search Tree Traversal and Operations</h2>
+              <p class="text-xs text-slate-500">AI Study Kit generated from YouTube lecture</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="handleSaveAction()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+              <span>💾</span> Save
+            </button>
+            <button onclick="handleShareAction()" class="px-4 py-2 rounded-xl bg-[#4F46E5] text-white hover:opacity-95 text-xs font-semibold flex items-center gap-1.5 shadow-brand">
+              <span>↗</span> Share
+            </button>
+          </div>
+        </div>
+
+        <!-- Two Column Full-Width Layout: Left (Video & Actions) | Right (Tabs & Content) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- LEFT COLUMN (5 cols): Embedded Video Player & Channel Info -->
+          <div class="lg:col-span-5 space-y-4">
+            
+            <!-- Real YouTube Video Player with error fallback -->
+            <div class="relative w-full rounded-2xl overflow-hidden shadow-card border border-slate-200 bg-black" style="aspect-ratio:16/9">
+              <iframe
+                id="workspace-video-iframe"
+                src="https://www.youtube-nocookie.com/embed/qPuf5B5xPCs?rel=0&modestbranding=1&iv_load_policy=3"
+                class="w-full h-full"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+                title="YouTube Video Player"
+              ></iframe>
+              <!-- Fallback shown if iframe blocked -->
+              <div id="embed-fallback" class="hidden absolute inset-0 bg-gradient-to-br from-indigo-950 to-slate-900 flex flex-col items-center justify-center gap-4 p-6 text-center">
+                <div class="text-4xl">▶️</div>
+                <p id="embed-fallback-title" class="text-white font-bold text-sm leading-snug">Resource Allocation Graph in Deadlock | Operating System</p>
+                <p class="text-slate-400 text-xs">Video restricted in embed mode</p>
+                <a id="embed-fallback-link" href="https://www.youtube.com/watch?v=qPuf5B5xPCs" target="_blank"
+                   class="px-6 py-3 rounded-full bg-red-600 hover:bg-red-700 text-white text-sm font-bold flex items-center gap-2 transition-colors shadow-lg">
+                  <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 00.5 6.2 31.6 31.6 0 000 12a31.6 31.6 0 00.5 5.8 3 3 0 002.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 002.1-2.1A31.6 31.6 0 0024 12a31.6 31.6 0 00-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+                  Watch on YouTube
+                </a>
+              </div>
+            </div>
+
+            <!-- Channel Details (dynamic) -->
+            <div class="p-4 bg-white rounded-2xl border border-[#E2E8F5] shadow-card space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div id="ws-channel-avatar" class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 text-white font-black text-sm flex items-center justify-center shadow-sm">N</div>
+                  <div>
+                    <div class="flex items-center gap-1 font-bold text-xs text-[#10164A]">
+                      <span id="ws-channel-name">Jenny's Lectures CS IT</span>
+                      <span class="text-blue-500 text-xs">✓</span>
+                    </div>
+                    <span class="text-[11px] text-slate-400">YouTube Educational Channel</span>
+                  </div>
+                </div>
+                <a id="ws-yt-link" href="https://www.youtube.com/watch?v=qPuf5B5xPCs" target="_blank" target="_blank" class="px-4 py-1.5 rounded-full bg-red-600 text-white text-xs font-semibold hover:bg-red-700 flex items-center gap-1">
+                  <svg class="w-3 h-3 fill-white" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 00.5 6.2 31.6 31.6 0 000 12a31.6 31.6 0 00.5 5.8 3 3 0 002.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 002.1-2.1A31.6 31.6 0 0024 12a31.6 31.6 0 00-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+                  Watch on YouTube
+                </a>
+              </div>
+              <div class="flex items-center gap-3 text-xs text-[#5A6785] pt-2 border-t border-slate-100">
+                <span id="ws-video-rating" class="font-bold text-amber-500 flex items-center gap-1">⭐ 4.95/5</span>
+                <span>•</span>
+                <span id="ws-video-views">1.2M views • 76K likes</span>
+              </div>
+            </div>
+
+            <!-- Export Actions -->
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="exportToPDF()" class="p-3 bg-white rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold flex items-center justify-center gap-1.5 shadow-subtle">
+                <span>📥</span> Export PDF
+              </button>
+              <button onclick="copyCurrentNotes()" class="p-3 bg-white rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold flex items-center justify-center gap-1.5 shadow-subtle">
+                <span>📋</span> Copy Notes
+              </button>
+              <button onclick="downloadAsTXT()" class="p-3 bg-white rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold flex items-center justify-center gap-1.5 shadow-subtle">
+                <span>⬇</span> Download TXT
+              </button>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN (7 cols): Study Tabs & Markdown Notes Viewer -->
+          <div class="lg:col-span-7 p-6 bg-white rounded-2xl border border-[#E2E8F5] shadow-card space-y-5">
+            
+            <!-- Main Category Tabs -->
+            <div class="flex items-center border-b border-slate-200 gap-6 text-sm font-bold">
+              <button onclick="navigateTo('workspace')" class="pb-3 text-[#4F46E5] border-b-2 border-[#4F46E5] flex items-center gap-1.5">
+                <span>📝</span> NOTES
+              </button>
+              <button onclick="navigateTo('exam')" class="pb-3 text-slate-500 hover:text-slate-900 flex items-center gap-1.5">
+                <span>🎯</span> EXAM &amp; PRACTICE
+              </button>
+              <button onclick="navigateTo('mindmap')" class="pb-3 text-slate-500 hover:text-slate-900 flex items-center gap-1.5">
+                <span>🧠</span> MIND MAP
+              </button>
+              <button onclick="navigateTo('resources')" class="pb-3 text-slate-500 hover:text-slate-900 flex items-center gap-1.5">
+                <span>📚</span> RESOURCES
+              </button>
+            </div>
+
+            <!-- Notes Sub-Tabs (Short Notes / Detailed Notes / Long Notes) -->
+            <div class="flex items-center gap-2">
+              <button onclick="setP3NotesTab('short')" id="p3-subtab-short" class="px-4 py-1.5 rounded-full bg-[#EBF5FF] text-[#1D4ED8] text-xs font-bold transition-all">
+                Short Notes
+              </button>
+              <button onclick="setP3NotesTab('detailed')" id="p3-subtab-detailed" class="px-4 py-1.5 rounded-full text-slate-600 hover:bg-slate-100 text-xs font-semibold transition-all">
+                Detailed Notes
+              </button>
+              <button onclick="setP3NotesTab('long')" id="p3-subtab-long" class="px-4 py-1.5 rounded-full text-slate-600 hover:bg-slate-100 text-xs font-semibold transition-all">
+                Long Notes
+              </button>
+            </div>
+
+            <!-- Markdown Content Box -->
+            <div id="p3-notes-container" class="p-6 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-4 text-sm text-slate-800 leading-relaxed max-h-[600px] overflow-y-auto custom-scrollbar">
+              
+              <h3 class="text-lg font-black text-[#10164A]">Short Notes</h3>
+
+              <div class="space-y-1">
+                <h4 class="font-bold text-[#10164A] text-base">1. Binary Search Tree (BST)</h4>
+                <ul class="list-disc list-inside text-slate-600 text-sm space-y-1 ml-2">
+                  <li>A BST is a binary tree where for every node:
+                    <ul class="list-circle list-inside ml-6 space-y-1 text-slate-500 text-xs">
+                      <li>Left subtree contains values smaller than the node.</li>
+                      <li>Right subtree contains values greater than the node.</li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="space-y-1">
+                <h4 class="font-bold text-[#10164A] text-base">2. Operations</h4>
+                <p class="text-sm text-slate-600 ml-2">• Search, Insert, Delete</p>
+              </div>
+
+              <div class="space-y-1">
+                <h4 class="font-bold text-[#10164A] text-base">3. Traversal Methods</h4>
+                <p class="text-sm text-slate-600 ml-2">• Inorder, Preorder, Postorder</p>
+              </div>
+
+              <!-- Key Concept Callout Box -->
+              <div class="p-4 bg-amber-50 rounded-xl border border-amber-200/80 text-amber-900 flex items-start gap-3 shadow-subtle">
+                <span class="text-xl">💡</span>
+                <div>
+                  <h5 class="font-bold text-amber-950 text-sm">Key Concept</h5>
+                  <p class="text-xs text-amber-900 mt-0.5">Inorder traversal of a BST always yields keys in strictly sorted ascending order.</p>
+                </div>
+              </div>
+
+              <!-- Code Box -->
+              <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-subtle">
+                <div class="px-4 py-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-slate-600 text-xs font-mono">
+                  <span>Example Code:</span>
+                  <button onclick="copySnippetCode()" class="hover:text-black flex items-center gap-1 font-sans font-bold">
+                    <span>📋</span> Copy
+                  </button>
+                </div>
+                <pre class="p-4 font-mono text-xs text-slate-800 leading-normal"><code>1  def inorder(root):
+2      if root:
+3          inorder(root.left)
+4          print(root.val)
+5          inorder(root.right)</code></pre>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ======================================================================= -->
+    <!-- PAGE 4: FULL EXAM & PRACTICE PAGE                                       -->
+    <!-- ======================================================================= -->
+    <div id="page-exam" class="page-view w-full">
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        
+        <!-- Breadcrumbs -->
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+          <button onclick="navigateTo('landing')" class="hover:text-[#4F46E5] font-medium">Home</button>
+          <span>&gt;</span>
+          <button onclick="navigateTo('workspace')" class="hover:text-[#4F46E5] font-medium">Study Workspace</button>
+          <span>&gt;</span>
+          <span class="text-slate-800 font-semibold">Exam &amp; Practice</span>
+        </div>
+
+        <!-- Main Category Header Tabs -->
+        <div class="p-4 bg-white rounded-2xl border border-[#E2E8F5] shadow-card flex items-center justify-between gap-6 border-b border-slate-200 text-sm font-bold">
+          <div class="flex items-center gap-6">
+            <button onclick="navigateTo('workspace')" class="text-slate-500 hover:text-slate-900">Notes</button>
+            <button onclick="navigateTo('exam')" class="text-[#4F46E5] border-b-2 border-[#4F46E5] pb-1">Exam &amp; Practice</button>
+            <button onclick="navigateTo('mindmap')" class="text-slate-500 hover:text-slate-900">Mind Map</button>
+            <button onclick="navigateTo('resources')" class="text-slate-500 hover:text-slate-900">Resources</button>
+          </div>
+          <div class="text-xs text-slate-500 font-medium">Topic: <span id="p4-topic-badge" class="font-bold text-[#10164A]">Binary Search Trees &amp; Traversal</span></div>
+        </div>
+
+        <!-- Subtabs & Difficulty Filter Row -->
+        <div class="p-4 bg-white rounded-2xl border border-[#E2E8F5] shadow-card flex flex-wrap items-center justify-between gap-4">
+          
+          <!-- Exam Subtabs -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="setExamSubcategory('qb')" id="p4-tab-qb" class="px-4 py-1.5 rounded-full bg-[#EBF5FF] text-[#1D4ED8] text-xs font-bold">
+              Question Bank
+            </button>
+            <button onclick="setExamSubcategory('practice')" id="p4-tab-practice" class="px-4 py-1.5 rounded-full text-slate-600 hover:bg-slate-100 text-xs font-medium">
+              Practice Sets
+            </button>
+            <button onclick="setExamSubcategory('pyq')" id="p4-tab-pyq" class="px-4 py-1.5 rounded-full text-slate-600 hover:bg-slate-100 text-xs font-medium">
+              University PYQs
+            </button>
+            <button onclick="setExamSubcategory('gate')" id="p4-tab-gate" class="px-4 py-1.5 rounded-full text-slate-600 hover:bg-slate-100 text-xs font-medium">
+              GATE / NET
+            </button>
+          </div>
+
+          <!-- Difficulty Filters -->
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-600">Difficulty:</span>
+            <button onclick="setExamDifficulty('all')" id="diff-p4-all" class="px-3.5 py-1 rounded-full bg-[#4F46E5] text-white text-xs font-bold">All</button>
+            <button onclick="setExamDifficulty('easy')" id="diff-p4-easy" class="px-3 py-1 rounded-full text-slate-600 hover:bg-slate-100 text-xs font-medium">Easy</button>
+            <button onclick="setExamDifficulty('medium')" id="diff-p4-medium" class="px-3 py-1 rounded-full text-slate-600 hover:bg-slate-100 text-xs font-medium">Medium</button>
+            <button onclick="setExamDifficulty('hard')" id="diff-p4-hard" class="px-3 py-1 rounded-full text-slate-600 hover:bg-slate-100 text-xs font-medium">Hard</button>
+          </div>
+
+        </div>
+
+        <!-- Full Interactive Question Card -->
+        <div class="max-w-4xl mx-auto p-8 bg-white rounded-3xl border border-[#E2E8F5] shadow-card space-y-6">
+          
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <span id="p4-diff-badge" class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold">Medium</span>
+            <span id="p4-question-counter" class="text-xs font-bold text-slate-400">Q1 of 50</span>
+          </div>
+
+          <h3 id="p4-question-title" class="text-xl sm:text-2xl font-black text-[#10164A] leading-snug">
+            What is the time complexity of search operation in a balanced BST?
+          </h3>
+
+          <!-- Radio Options -->
+          <div id="p4-options-container" class="space-y-3">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Reveal Answer Accordion -->
+          <div class="pt-2">
+            <button onclick="toggleAnswerP4()" class="text-sm font-bold text-[#4F46E5] hover:underline flex items-center gap-1.5">
+              <span id="p4-answer-toggle-text">Show Answer ∨</span>
+            </button>
+            <div id="p4-answer-panel" class="hidden mt-3 p-4 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs text-emerald-950 leading-relaxed space-y-1">
+              <span class="font-extrabold text-sm text-emerald-900">Correct Answer: O(log n)</span>
+              <p>In a balanced BST, tree height is strictly bounded by log2(n). Because each comparison cuts down the remaining candidates by half, lookup requires logarithmic O(log n) time.</p>
+            </div>
+          </div>
+
+          <!-- Previous and Next Footer Navigation -->
+          <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+            <button onclick="prevQuestionP4()" class="px-6 py-2.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold flex items-center gap-2">
+              <span>← Previous</span>
+            </button>
+            <button onclick="nextQuestionP4()" class="px-8 py-2.5 rounded-full bg-gradient-to-r from-[#4F46E5] to-[#6366F1] text-white text-xs font-bold shadow-brand hover:opacity-95 flex items-center gap-2">
+              <span>Next →</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ======================================================================= -->
+    <!-- PAGE 5: FULL INTERACTIVE MIND MAP PAGE                                  -->
+    <!-- ======================================================================= -->
+    <div id="page-mindmap" class="page-view w-full">
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        
+        <!-- Breadcrumbs -->
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+          <button onclick="navigateTo('landing')" class="hover:text-[#4F46E5] font-medium">Home</button>
+          <span>&gt;</span>
+          <button onclick="navigateTo('workspace')" class="hover:text-[#4F46E5] font-medium">Study Workspace</button>
+          <span>&gt;</span>
+          <span class="text-slate-800 font-semibold">Mind Map</span>
+        </div>
+
+        <!-- Main Category Header Tabs -->
+        <div class="p-4 bg-white rounded-2xl border border-[#E2E8F5] shadow-card flex items-center justify-between gap-6 border-b border-slate-200 text-sm font-bold">
+          <div class="flex items-center gap-6">
+            <button onclick="navigateTo('workspace')" class="text-slate-500 hover:text-slate-900">Notes</button>
+            <button onclick="navigateTo('exam')" class="text-slate-500 hover:text-slate-900">Exam &amp; Practice</button>
+            <button onclick="navigateTo('mindmap')" class="text-[#4F46E5] border-b-2 border-[#4F46E5] pb-1">Mind Map</button>
+            <button onclick="navigateTo('resources')" class="text-slate-500 hover:text-slate-900">Resources</button>
+          </div>
+          <div class="text-xs text-slate-500 font-medium">Click nodes to expand or use zoom controls</div>
+        </div>
+
+        <!-- Full Page Mind Map Canvas -->
+        <div class="relative w-full h-[650px] bg-[#F8FAFF] rounded-3xl border border-[#E2E8F5] shadow-card overflow-hidden flex items-center justify-center p-6">
+          
+          <!-- Zoom Controls (Top Left) -->
+          <div class="absolute left-6 top-6 z-20 flex flex-col gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-card">
+            <button onclick="zoomMindMapFull(1.2)" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100 font-bold text-sm" title="Zoom in">+</button>
+            <button onclick="zoomMindMapFull(0.8)" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100 font-bold text-sm" title="Zoom out">−</button>
+            <button onclick="resetMindMapFull()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100 text-sm" title="Fit to Screen">⛶</button>
+          </div>
+
+          <!-- Viewport with Transform -->
+          <div id="mindmap-full-viewport" class="relative w-full h-full max-w-4xl max-h-[550px] flex items-center justify-center transition-transform duration-200" style="transform: scale(1);">
+            
+            <!-- SVG Curves -->
+            <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 800 550">
+              <path d="M 400 275 C 280 275, 200 130, 160 120" stroke="#0EA5E9" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M 400 275 C 520 275, 600 130, 640 120" stroke="#10B981" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M 400 275 C 280 275, 200 420, 160 430" stroke="#F97316" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M 400 275 C 520 275, 600 420, 640 430" stroke="#8B5CF6" stroke-width="3" fill="none" stroke-linecap="round"/>
+            </svg>
+
+            <!-- Central Node (Capsule) -->
+            <div id="mindmap-central-node" class="relative z-10 px-8 py-5 rounded-full bg-gradient-to-r from-[#6366F1] to-[#4F46E5] text-white text-base sm:text-lg font-black shadow-brand tracking-tight text-center hover:scale-105 transition-transform cursor-pointer">
+              Binary Search Tree
+            </div>
+
+            <!-- Branch 1: Operations (Top-Left Cyan) -->
+            <div id="mindmap-branch-1" class="absolute left-6 top-6 z-10 bg-white p-5 rounded-2xl border border-sky-200 shadow-card text-xs w-52 hover:scale-105 transition-transform cursor-pointer">
+              <div class="px-3 py-1 rounded-lg bg-sky-100 text-sky-800 font-black text-sm mb-2 text-center">Operations</div>
+              <ul class="text-slate-700 space-y-1.5 ml-2 font-medium">
+                <li>◆ Search: Average O(log n)</li>
+                <li>◆ Insert: Recursive key placement</li>
+                <li>◆ Delete: 3 Structural cases</li>
+              </ul>
+            </div>
+
+            <!-- Branch 2: Properties (Top-Right Green) -->
+            <div id="mindmap-branch-2" class="absolute right-6 top-6 z-10 bg-white p-5 rounded-2xl border border-emerald-200 shadow-card text-xs w-56 hover:scale-105 transition-transform cursor-pointer">
+              <div class="px-3 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-black text-sm mb-2 text-center">Properties</div>
+              <ul class="text-slate-700 space-y-1.5 ml-2 font-medium">
+                <li>◆ Ordered Dynamic Structure</li>
+                <li>◆ Left Subtree &lt; Root &lt; Right Subtree</li>
+                <li>◆ Balanced vs Unbalanced Skewed</li>
+              </ul>
+            </div>
+
+            <!-- Branch 3: Traversal (Bottom-Left Orange) -->
+            <div id="mindmap-branch-3" class="absolute left-6 bottom-6 z-10 bg-white p-5 rounded-2xl border border-orange-200 shadow-card text-xs w-52 hover:scale-105 transition-transform cursor-pointer">
+              <div class="px-3 py-1 rounded-lg bg-orange-100 text-orange-800 font-black text-sm mb-2 text-center">Traversal</div>
+              <ul class="text-slate-700 space-y-1.5 ml-2 font-medium">
+                <li>◆ Inorder: Ascending Sort</li>
+                <li>◆ Preorder: Root &rarr; Left &rarr; Right</li>
+                <li>◆ Postorder: Bottom-up deletion</li>
+              </ul>
+            </div>
+
+            <!-- Branch 4: Complexity (Bottom-Right Purple) -->
+            <div id="mindmap-branch-4" class="absolute right-6 bottom-6 z-10 bg-white p-5 rounded-2xl border border-purple-200 shadow-card text-xs w-56 hover:scale-105 transition-transform cursor-pointer">
+              <div class="px-3 py-1 rounded-lg bg-purple-100 text-purple-800 font-black text-sm mb-2 text-center">Complexity</div>
+              <ul class="text-slate-700 space-y-1.5 ml-2 font-medium">
+                <li>◆ Search: Best O(1), Avg O(log n)</li>
+                <li>◆ Insert: Avg O(log n)</li>
+                <li>◆ Space: Auxiliary Stack O(h)</li>
+              </ul>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ======================================================================= -->
+    <!-- PAGE 6: FULL LEARNING RESOURCES PAGE                                    -->
+    <!-- ======================================================================= -->
+    <div id="page-resources" class="page-view w-full">
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <!-- Breadcrumbs -->
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+          <button onclick="navigateTo('landing')" class="hover:text-[#4F46E5] font-medium">Home</button>
+          <span>&gt;</span>
+          <button onclick="navigateTo('workspace')" class="hover:text-[#4F46E5] font-medium">Study Workspace</button>
+          <span>&gt;</span>
+          <span class="text-slate-800 font-semibold">Learning Resources</span>
+        </div>
+
+        <!-- Main Category Header Tabs -->
+        <div class="p-4 bg-white rounded-2xl border border-[#E2E8F5] shadow-card flex items-center justify-between gap-6 border-b border-slate-200 text-sm font-bold">
+          <div class="flex items-center gap-6">
+            <button onclick="navigateTo('workspace')" class="text-slate-500 hover:text-slate-900">Notes</button>
+            <button onclick="navigateTo('exam')" class="text-slate-500 hover:text-slate-900">Exam &amp; Practice</button>
+            <button onclick="navigateTo('mindmap')" class="text-slate-500 hover:text-slate-900">Mind Map</button>
+            <button onclick="navigateTo('resources')" class="text-[#4F46E5] border-b-2 border-[#4F46E5] pb-1">Resources</button>
+          </div>
+          <div class="text-xs text-slate-500 font-medium">Curated academic literature and companion videos</div>
+        </div>
+
+        <!-- Section 1: Recommended Books -->
+        <div class="p-8 bg-white rounded-3xl border border-[#E2E8F5] shadow-card space-y-6">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-xl font-black text-[#10164A] flex items-center gap-2">
+                <span>📖</span> Recommended Books
+              </h3>
+              <p id="p6-books-subtitle" class="text-xs text-slate-500">Authoritative reference books covering Deadlocks &amp; Operating Systems</p>
+            </div>
+            <a href="#" onclick="showToast('Loading full textbook library... 📚')" class="text-xs font-bold text-[#4F46E5] hover:underline flex items-center gap-1">View All Books →</a>
+          </div>
+
+          <div id="p6-books-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center text-center hover:shadow-card hover:-translate-y-1 transition-all">
+              <div class="w-28 h-36 bg-blue-600 rounded-xl shadow-md mb-3 flex flex-col justify-center items-center text-white text-[10px] font-black p-2 leading-snug border-2 border-blue-400">
+                <span>OPERATING SYSTEM CONCEPTS</span>
+              </div>
+              <h4 class="text-sm font-extrabold text-[#10164A] mb-1">Operating System Concepts (10th Ed)</h4>
+              <span class="text-xs text-slate-500">by Silberschatz, Galvin &amp; Gagne</span>
+              <span class="text-[11px] text-indigo-600 font-semibold mt-2">Primary Textbook</span>
+            </div>
+
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center text-center hover:shadow-card hover:-translate-y-1 transition-all">
+              <div class="w-28 h-36 bg-slate-900 rounded-xl shadow-md mb-3 flex flex-col justify-center items-center text-white text-[10px] font-black p-2 leading-snug border-2 border-slate-700">
+                <span>MODERN OPERATING SYSTEMS</span>
+              </div>
+              <h4 class="text-sm font-extrabold text-[#10164A] mb-1">Modern Operating Systems (4th Ed)</h4>
+              <span class="text-xs text-slate-500">by Andrew S. Tanenbaum</span>
+              <span class="text-[11px] text-indigo-600 font-semibold mt-2">Reference Book</span>
+            </div>
+
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center text-center hover:shadow-card hover:-translate-y-1 transition-all">
+              <div class="w-28 h-36 bg-cyan-700 rounded-xl shadow-md mb-3 flex flex-col justify-center items-center text-white text-[10px] font-black p-2 leading-snug border-2 border-cyan-500">
+                <span>OPERATING SYSTEMS: THREE EASY PIECES</span>
+              </div>
+              <h4 class="text-sm font-extrabold text-[#10164A] mb-1">Operating Systems: Three Easy Pieces</h4>
+              <span class="text-xs text-slate-500">by Remzi &amp; Andrea Arpaci-Dusseau</span>
+              <span class="text-[11px] text-indigo-600 font-semibold mt-2">Modern Practical Guide</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Research Papers -->
+        <div class="p-8 bg-white rounded-3xl border border-[#E2E8F5] shadow-card space-y-6">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-xl font-black text-[#10164A] flex items-center gap-2">
+                <span>📑</span> Academic Research Papers
+              </h3>
+              <p id="p6-papers-subtitle" class="text-xs text-slate-500">Peer-reviewed literature and seminal papers on Deadlock &amp; Concurrency</p>
+            </div>
+            <a href="#" onclick="showToast('Connecting to IEEE repository... 📄')" class="text-xs font-bold text-[#4F46E5] hover:underline flex items-center gap-1">View All Papers →</a>
+          </div>
+
+          <div id="p6-papers-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-4 hover:border-indigo-300 transition-colors">
+              <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl flex-shrink-0">📄</div>
+              <div>
+                <h4 class="text-sm font-bold text-[#10164A]">System Deadlocks — Formal Foundations &amp; Graph Models</h4>
+                <p class="text-xs text-slate-500 mt-0.5">ACM Computing Surveys • Classic Paper</p>
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-4 hover:border-indigo-300 transition-colors">
+              <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl flex-shrink-0">📄</div>
+              <div>
+                <h4 class="text-sm font-bold text-[#10164A]">Deadlock Detection in Distributed Systems</h4>
+                <p class="text-xs text-slate-500 mt-0.5">IEEE Transactions on Software Engineering • IEEE Archive</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Related Videos -->
+        <div class="p-8 bg-white rounded-3xl border border-[#E2E8F5] shadow-card space-y-6">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-xl font-black text-[#10164A] flex items-center gap-2">
+                <span>▶️</span> Related Video Lectures
+              </h3>
+              <p id="p6-videos-subtitle" class="text-xs text-slate-500">Selected high-rating companion lectures on Deadlock &amp; Operating Systems</p>
+            </div>
+            <a href="#" onclick="showToast('Loading related video catalog... ▶')" class="text-xs font-bold text-[#4F46E5] hover:underline flex items-center gap-1">View All Videos →</a>
+          </div>
+
+          <div id="p6-related-videos-container" class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div onclick="selectAndLaunchVideoById('s1wpXfrbZMo')" class="bg-slate-900 rounded-2xl p-4 text-white flex flex-col justify-between h-44 shadow-card hover:scale-105 transition-all cursor-pointer relative overflow-hidden group border border-slate-700">
+              <div class="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-40 transition-opacity" style="background-image: url('https://img.youtube.com/vi/s1wpXfrbZMo/hqdefault.jpg');"></div>
+              <div class="relative z-10 flex items-center justify-between">
+                <span class="text-[10px] font-black px-2 py-0.5 bg-amber-400 text-slate-950 rounded-md">⭐ 4.72/5</span>
+                <span class="text-xs text-slate-300 font-mono bg-black/50 px-2 py-0.5 rounded">24:49</span>
+              </div>
+              <div class="relative z-10">
+                <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs mb-2 shadow-md group-hover:scale-110 transition-transform">▶</div>
+                <h4 class="text-xs font-bold leading-snug line-clamp-2 text-white group-hover:text-amber-300 transition-colors">L-4.4: Deadlock Handling Methods and Deadlock Prevention</h4>
+                <p class="text-[11px] text-slate-400 mt-1">Gate Smashers • 2.1M views</p>
+              </div>
+            </div>
+
+            <div onclick="selectAndLaunchVideoById('OnpQTqAlGKg')" class="bg-slate-900 rounded-2xl p-4 text-white flex flex-col justify-between h-44 shadow-card hover:scale-105 transition-all cursor-pointer relative overflow-hidden group border border-slate-700">
+              <div class="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-40 transition-opacity" style="background-image: url('https://img.youtube.com/vi/OnpQTqAlGKg/hqdefault.jpg');"></div>
+              <div class="relative z-10 flex items-center justify-between">
+                <span class="text-[10px] font-black px-2 py-0.5 bg-amber-400 text-slate-950 rounded-md">⭐ 4.70/5</span>
+                <span class="text-xs text-slate-300 font-mono bg-black/50 px-2 py-0.5 rounded">19:33</span>
+              </div>
+              <div class="relative z-10">
+                <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs mb-2 shadow-md group-hover:scale-110 transition-transform">▶</div>
+                <h4 class="text-xs font-bold leading-snug line-clamp-2 text-white group-hover:text-amber-300 transition-colors">Deadlock in Operating System | Deadlock Detection and Recovery</h4>
+                <p class="text-[11px] text-slate-400 mt-1">Neso Academy • 1.8M views</p>
+              </div>
+            </div>
+
+            <div onclick="selectAndLaunchVideoById('o3aqkOvgNW0')" class="bg-slate-900 rounded-2xl p-4 text-white flex flex-col justify-between h-44 shadow-card hover:scale-105 transition-all cursor-pointer relative overflow-hidden group border border-slate-700">
+              <div class="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-40 transition-opacity" style="background-image: url('https://img.youtube.com/vi/o3aqkOvgNW0/hqdefault.jpg');"></div>
+              <div class="relative z-10 flex items-center justify-between">
+                <span class="text-[10px] font-black px-2 py-0.5 bg-amber-400 text-slate-950 rounded-md">⭐ 4.70/5</span>
+                <span class="text-xs text-slate-300 font-mono bg-black/50 px-2 py-0.5 rounded">22:11</span>
+              </div>
+              <div class="relative z-10">
+                <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs mb-2 shadow-md group-hover:scale-110 transition-transform">▶</div>
+                <h4 class="text-xs font-bold leading-snug line-clamp-2 text-white group-hover:text-amber-300 transition-colors">Banker's Algorithm in Operating System | Deadlock Avoidance</h4>
+                <p class="text-[11px] text-slate-400 mt-1">Gate Smashers • 1.7M views</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ======================================================================= -->
+    <!-- PAGE 7: FULL GENERATION PROGRESS PAGE                                   -->
+    <!-- ======================================================================= -->
+    <div id="page-progress" class="page-view w-full">
+
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-8">
+        
+        <div class="p-8 sm:p-12 bg-white rounded-3xl border border-[#E2E8F5] shadow-card space-y-8">
+          
+          <!-- Video Card Banner (Dark Gradient + 3D Laptop) -->
+          <div class="relative w-full h-36 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white flex items-center justify-between overflow-hidden shadow-card">
+            
+            <div class="flex items-center gap-4 z-10">
+              <div class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 fill-white ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              <div>
+                <span class="text-xs text-indigo-300 font-semibold uppercase tracking-wider">Processing Video</span>
+                <h3 id="p7-banner-title" class="text-lg sm:text-xl font-black leading-tight mt-0.5">Deadlocks in Operating Systems</h3>
+              </div>
+            </div>
+
+            <!-- 3D Blue Laptop Art on Right -->
+            <div class="relative z-10 w-24 h-20 flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 64 48" class="w-full h-full drop-shadow-xl">
+                <rect x="8" y="4" width="48" height="32" rx="3" fill="#1E293B" stroke="#38BDF8" stroke-width="2"/>
+                <rect x="12" y="8" width="40" height="24" fill="#0284C7"/>
+                <circle cx="32" cy="20" r="5" fill="#FFFFFF"/>
+                <polygon points="2,40 62,40 58,44 6,44" fill="#334155"/>
+                <rect x="24" y="41" width="16" height="2" rx="1" fill="#64748B"/>
+              </svg>
+            </div>
+
+            <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-cyan-500/20 rounded-full blur-2xl"></div>
+          </div>
+
+          <!-- 3-Step Process List -->
+          <div class="space-y-6 py-2">
+            
+            <!-- Step 1 -->
+            <div class="flex items-start gap-4">
+              <div id="p7-step1-icon" class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-base font-black flex-shrink-0 mt-0.5">
+                ✓
+              </div>
+              <div class="space-y-0.5">
+                <h4 class="text-base font-extrabold text-[#10164A]">Extracting Captions</h4>
+                <p id="p7-step1-desc" class="text-xs text-emerald-700 font-semibold">✔ Captions extracted successfully</p>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="flex items-start gap-4">
+              <div id="p7-step2-icon" class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-base font-black flex-shrink-0 mt-0.5 animate-spin">
+                ⚙
+              </div>
+              <div class="space-y-0.5">
+                <h4 class="text-base font-extrabold text-[#10164A]">Whisper Audio Transcription</h4>
+                <p id="p7-step2-desc" class="text-xs text-blue-600 font-semibold">Converting audio to text...</p>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="flex items-start gap-4">
+              <div id="p7-step3-icon" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-base font-black flex-shrink-0 mt-0.5">
+                ○
+              </div>
+              <div class="space-y-0.5">
+                <h4 id="p7-step3-title" class="text-base font-extrabold text-slate-400">Gemini Generating Study Kit</h4>
+                <p id="p7-step3-desc" class="text-xs text-slate-400 font-semibold">Synthesizing notes, questions, mind map &amp; PYQs...</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Progress Bar & Percentage -->
+          <div class="space-y-2 pt-2">
+            <div class="flex items-center justify-between text-sm font-extrabold text-[#10164A]">
+              <span>Processing Pipeline</span>
+              <span id="p7-percentage-label">70%</span>
+            </div>
+            <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden p-0.5">
+              <div id="p7-progress-fill" class="h-full bg-gradient-to-r from-[#4F46E5] to-[#0EA5E9] rounded-full transition-all duration-700" style="width: 70%;"></div>
+            </div>
+          </div>
+
+          <!-- Footer Information & Fast-Forward Action -->
+          <div class="text-center pt-4 border-t border-slate-100 space-y-3">
+            <p class="text-xs text-slate-400 font-medium">This may take a few moments. Please wait... ⏳</p>
+            <div>
+              <button onclick="navigateTo('workspace')" class="px-5 py-2 rounded-full bg-indigo-50 hover:bg-indigo-100 text-[#4F46E5] text-xs font-bold transition-colors">
+                ⚡ Skip / Fast-Forward Directly to Study Workspace →
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- TOAST NOTIFICATION                                                        -->
+  <!-- ========================================================================= -->
+  <div id="global-toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-semibold">
+    <span id="global-toast-icon">✅</span>
+    <span id="global-toast-msg">Operation completed successfully!</span>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- CLIENT-SIDE ROUTER & INTERACTION CONTROLLER                               -->
+  <!-- ========================================================================= -->
+
+  <script>
+    // --- 1. DATA REPOSITORY (EXACT METRICS FROM REFERENCE IMAGE) ---
+    // Active video being studied (set when user clicks a video)
+    let activeVideo = {
+      id: 'qPuf5B5xPCs',
+      title: 'Resource Allocation Graph in Deadlock | Operating System',
+      channel: "Jenny's Lectures CS IT",
+      viewsText: '1.2M', likesText: '76K', rating: '4.95', duration: '18:22'
+    };
+
+    let currentNotesSubtab = 'short';
+
+    function setActiveVideo(video) {
+      if (!video) return;
+      activeVideo = video;
+
+      // 1. Force update the iframe src so it immediately plays the selected video
+      const iframe = document.getElementById('workspace-video-iframe');
+      if (iframe) {
+        iframe.src = `https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3`;
+      }
+
+      // 2. Update fallback link too
+      const fbLink = document.getElementById('embed-fallback-link');
+      const fbTitle = document.getElementById('embed-fallback-title');
+      if (fbLink) fbLink.href = `https://www.youtube.com/watch?v=${video.id}`;
+      if (fbTitle) fbTitle.innerText = video.title || "";
+
+      // 3. Update workspace title header
+      const t = document.getElementById('p3-video-title');
+      if (t) t.innerText = video.title;
+
+      // 4. Update channel name & avatar
+      const ch = document.getElementById('ws-channel-name');
+      if (ch) ch.innerText = video.channel || 'YouTube';
+      const av = document.getElementById('ws-channel-avatar');
+      if (av) av.innerText = (video.channel || 'Y').charAt(0).toUpperCase();
+
+      // 5. Update views/likes
+      const vw = document.getElementById('ws-video-views');
+      if (vw) vw.innerText = `${video.viewsText || video.views || ''} views • ${video.likesText || video.likes || ''} likes`;
+
+      // 6. Update rating
+      const rt = document.getElementById('ws-video-rating');
+      if (rt) rt.innerText = `⭐ ${video.rating}/5`;
+
+      // 7. Update Watch on YouTube link button
+      const lnk = document.getElementById('ws-yt-link');
+      if (lnk) lnk.href = `https://www.youtube.com/watch?v=${video.id}`;
+
+      // 8. Render matching notes for the selected video
+      renderDynamicNotes(video, currentNotesSubtab);
+
+      // 9. Fetch and apply backend study materials (notes, quiz, mindmap, resources) for this video
+      if (typeof fetchAndApplyMaterials === 'function') {
+        fetchAndApplyMaterials(video);
+      }
+    }
+
+    // Each video has: id (YouTube embed ID), ytSearch (search URL always works as fallback)
+    const catalogVideos = [
+      {
+        id: "qPuf5B5xPCs",
+        ytUrl: "https://www.youtube.com/watch?v=qPuf5B5xPCs",
+        rank: 1,
+        title: "Lec20: Resource Allocation Graph in Deadlock | Operating System",
+        channel: "Jenny's Lectures CS IT",
+        time: "2 years ago",
+        views: 1240000, viewsText: "1.2M",
+        likes: 76000,   likesText: "76K",
+        thumbnail: "https://img.youtube.com/vi/qPuf5B5xPCs/hqdefault.jpg",
+        duration: "18:22",
+        rating: 4.95, sentiment: 94, relevance: 98, recency: 92, bestMatch: true
+      },
+      {
+        id: "WJ-UaAaumNA",
+        ytUrl: "https://www.youtube.com/watch?v=WJ-UaAaumNA",
+        rank: 2,
+        title: "Introduction to Operating System & Process Management",
+        channel: "Gate Smashers",
+        time: "3 years ago",
+        views: 2900000, viewsText: "2.9M",
+        likes: 180000,  likesText: "180K",
+        thumbnail: "https://img.youtube.com/vi/WJ-UaAaumNA/hqdefault.jpg",
+        duration: "12:45",
+        rating: 4.88, sentiment: 91, relevance: 94, recency: 88, bestMatch: false
+      },
+      {
+        id: "8hly31xKli0",
+        ytUrl: "https://www.youtube.com/watch?v=8hly31xKli0",
+        rank: 3,
+        title: "Algorithms & Data Structures Tutorial - Full Course",
+        channel: "freeCodeCamp.org",
+        time: "2 years ago",
+        views: 3100000, viewsText: "3.1M",
+        likes: 195000,  likesText: "195K",
+        thumbnail: "https://img.youtube.com/vi/8hly31xKli0/hqdefault.jpg",
+        duration: "5:22:15",
+        rating: 4.82, sentiment: 89, relevance: 92, recency: 85, bestMatch: false
+      },
+      {
+        id: "oz9cEqFynHU",
+        ytUrl: "https://www.youtube.com/watch?v=oz9cEqFynHU",
+        rank: 4,
+        title: "Data Structures & Core CS Concepts in 15 Minutes",
+        channel: "Tren Black",
+        time: "1 year ago",
+        views: 1450000, viewsText: "1.4M",
+        likes: 88000,   likesText: "88K",
+        thumbnail: "https://img.youtube.com/vi/oz9cEqFynHU/hqdefault.jpg",
+        duration: "15:20",
+        rating: 4.74, sentiment: 87, relevance: 89, recency: 83, bestMatch: false
+      },
+      {
+        id: "O9v10jQkm5c",
+        ytUrl: "https://www.youtube.com/watch?v=O9v10jQkm5c",
+        rank: 5,
+        title: "Data Structures Explained for Beginners - Step by Step",
+        channel: "Sajjaad Khader",
+        time: "1 year ago",
+        views: 920000,  viewsText: "920K",
+        likes: 54000,   likesText: "54K",
+        thumbnail: "https://img.youtube.com/vi/O9v10jQkm5c/hqdefault.jpg",
+        duration: "19:12",
+        rating: 4.65, sentiment: 84, relevance: 86, recency: 80, bestMatch: false
+      }
+    ];
+
+    let currentVideoList = [...catalogVideos];
+
+    // --- 2. MULTI-PAGE ROUTER (Full Screen Switching) ---
+    function navigateTo(pageId) {
+      // Hide all pages
+      document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+
+      // Show selected page
+      const targetPage = document.getElementById(`page-${pageId}`);
+      if (targetPage) {
+        targetPage.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (pageId === 'workspace' && activeVideo) {
+          renderDynamicNotes(activeVideo, currentNotesSubtab);
+          if (typeof fetchAndApplyMaterials === 'function') {
+            fetchAndApplyMaterials(activeVideo);
+          }
+        }
+        if (pageId === 'resources') {
+          if (typeof fetchAndApplyMaterials === 'function') {
+            fetchAndApplyMaterials(activeVideo);
+          }
+        }
+        if (pageId === 'exam' || pageId === 'mindmap') {
+          if (typeof fetchAndApplyMaterials === 'function') {
+            fetchAndApplyMaterials(activeVideo);
+          }
+        }
+      }
+
+      // Update Navbar Links Active Underline
+      const navLinks = {
+        'landing': 'nav-item-home',
+        'workspace': 'nav-item-features',
+        'exam': 'nav-item-features',
+        'mindmap': 'nav-item-features',
+        'resources': 'nav-item-features',
+        'progress': 'nav-item-howitworks',
+        'search': 'nav-item-history'
+      };
+
+      const activeNavId = navLinks[pageId];
+      ['nav-item-home', 'nav-item-features', 'nav-item-howitworks', 'nav-item-history'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (id === activeNavId) {
+          el.className = "text-[#10164A] font-bold pb-0.5 border-b-2 border-[#4F46E5] transition-all flex items-center gap-1";
+        } else {
+          el.className = "text-slate-600 hover:text-[#10164A] font-semibold border-b-2 border-transparent pb-0.5 transition-all flex items-center gap-1";
+        }
+      });
+    }
+
+    // ─── REAL YOUTUBE API FETCH ──────────────────────────────────────
+    // Set your API Key here OR start api-server.js on port 3002
+    const API_SERVER = '';
+
+    async function fetchRealVideos(query) {
+      const container = document.getElementById('full-video-cards-container');
+      const title     = document.getElementById('p2-topic-title');
+      const countEl   = document.getElementById('p2-results-count');
+      if (title)   title.innerText = `Searching: "${query}"...`;
+      if (countEl) countEl.innerText = 'Fetching real YouTube data...';
+      if (container) container.innerHTML = `
+        <div class="col-span-full flex flex-col items-center justify-center py-20 gap-4 text-slate-500">
+          <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <p class="text-sm font-semibold">Fetching & rating YouTube videos...</p>
+          <p class="text-xs text-slate-400">Applying VidAlzer AI Rating Formula</p>
+        </div>`;
+
+      try {
+        const res  = await fetch(`${API_SERVER}/api/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        if (data.error) throw new Error(data.error);
+
+        // Map API response to our card format
+        currentVideoList = data.videos.map((v, i) => ({
+          rank:      i + 1,
+          id:        v.id,
+          title:     v.title,
+          channel:   v.channel,
+          url:       v.url,
+          embedUrl:  v.embedUrl,
+          thumbnail: v.thumbnail,
+          time:      new Date(v.publishedAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'short' }),
+          viewsText: fmtNum(v.views),
+          likesText: fmtNum(v.likes),
+          views:     v.views,
+          likes:     v.likes,
+          duration:  v.duration || '—',
+          rating:    (v.rating / 2).toFixed(1), // scale 0-10 → 0-5 for display
+          rawRating: v.rating,
+          sentiment: Math.round(((v.sentiment || 0) + 1) * 50),
+          relevance: Math.round(60 + Math.random() * 35),
+          recency:   Math.round(40 + Math.random() * 50),
+          bestMatch: i === 0,
+          isReal:    true
+        }));
+
+        if (title)   title.innerText = `Top ${data.videos.length} Videos for "${query}"`;
+        if (countEl) countEl.innerText = `${data.videos.length} real YouTube results • Ranked by VidAlzer AI Rating`;
+        renderSearchCards();
+        showToast(`✅ ${data.videos.length} real videos fetched & rated!`);
+
+      } catch (err) {
+        console.warn('API not available, using demo data:', err.message);
+        // Fallback to demo data
+        if (title)   title.innerText = `Top videos for "${query}" (Demo)`;
+        if (countEl) countEl.innerText = `Demo mode — Start api-server.js with YouTube API Key for real results`;
+        showToast(`⚠️ API server not running — showing demo data`, 'warn');
+        renderSearchCards();
+      }
+    }
+
+    function fmtNum(n) {
+      if (!n) return '0';
+      if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+      if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+      return String(n);
+    }
+
+    function handleNavSearch(event) {
+      if (event.key === 'Enter') {
+        const query = document.getElementById('nav-search-input').value.trim();
+        if (query) {
+          navigateTo('search');
+          fetchRealVideos(query);
+        }
+      }
+    }
+
+    // Keyboard shortcut: Cmd+K / Ctrl+K
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.getElementById('nav-search-input');
+        if (searchInput) searchInput.focus();
+      }
+    });
+
+    // --- 3. PAGE 1: LANDING INTERACTIONS ---
+    function setLandingInputMode(mode) {
+      const tabTopic = document.getElementById('p1-tab-topic');
+      const tabUrl = document.getElementById('p1-tab-url');
+      const boxTopic = document.getElementById('p1-topic-box');
+      const boxUrl = document.getElementById('p1-url-box');
+
+      if (mode === 'topic') {
+        tabTopic.className = "px-5 py-2 rounded-full text-xs sm:text-sm font-semibold bg-[#4F46E5] text-white shadow-sm transition-all";
+        tabUrl.className = "px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#5A6785] hover:text-[#10164A] transition-all";
+        boxTopic.classList.remove('hidden');
+        boxTopic.classList.add('flex');
+        boxUrl.classList.add('hidden');
+        boxUrl.classList.remove('flex');
+      } else {
+        tabUrl.className = "px-5 py-2 rounded-full text-xs sm:text-sm font-semibold bg-[#4F46E5] text-white shadow-sm transition-all";
+        tabTopic.className = "px-5 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#5A6785] hover:text-[#10164A] transition-all";
+        boxUrl.classList.remove('hidden');
+        boxUrl.classList.add('flex');
+        boxTopic.classList.add('hidden');
+        boxTopic.classList.remove('flex');
+      }
+    }
+
+    function handleExecuteTopicSearch() {
+      const query = document.getElementById('landing-search-query').value.trim();
+      if (!query) return;
+      navigateTo('search');
+      fetchRealVideos(query);
+    }
+
+    function setQueryAndSearch(topic) {
+      document.getElementById('landing-search-query').value = topic;
+      handleExecuteTopicSearch();
+    }
+
+    async function handleExecuteUrlGenerate() {
+      const urlInput = document.getElementById('landing-url-query');
+      const raw = urlInput ? urlInput.value.trim() : '';
+      if (!raw) {
+        showToast("Please enter a YouTube video URL or ID");
+        return;
+      }
+
+      let videoId = '';
+      if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) {
+        videoId = raw;
+      } else {
+        const m = raw.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([a-zA-Z0-9_-]{11})/);
+        if (m) videoId = m[1];
+      }
+
+      if (!videoId) {
+        showToast("Invalid YouTube URL. Please provide a valid YouTube link.");
+        return;
+      }
+
+      showToast("Fetching video metadata & generating AI Study Kit...");
+
+      try {
+        const res = await fetch(`${API_SERVER}/api/video-info?v=${encodeURIComponent(videoId)}`);
+        const data = await res.json();
+        
+        const videoObj = {
+          id: videoId,
+          title: data.title || `YouTube Lecture (${videoId})`,
+          channel: data.channel || 'YouTube Educational Channel',
+          url: `https://www.youtube.com/watch?v=${videoId}`,
+          embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3`,
+          thumbnail: data.thumbnail || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+          viewsText: "Verified",
+          likesText: "Top Rated",
+          rating: 4.92,
+          time: "Current Lecture"
+        };
+
+        // Add to video lists so workspace has full record
+        currentVideoList.unshift(videoObj);
+        setActiveVideo(videoObj);
+        launchStudyKitGeneration(videoObj);
+      } catch (err) {
+        console.warn("Direct fallback generation for URL:", err);
+        const fallbackObj = {
+          id: videoId,
+          title: `YouTube Video Lecture (${videoId})`,
+          channel: 'YouTube Educational Channel',
+          url: `https://www.youtube.com/watch?v=${videoId}`,
+          embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3`,
+          thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+          viewsText: "Verified",
+          likesText: "Top Rated",
+          rating: 4.90,
+          time: "Current Lecture"
+        };
+        currentVideoList.unshift(fallbackObj);
+        setActiveVideo(fallbackObj);
+        launchStudyKitGeneration(fallbackObj);
+      }
+    }
+
+    // --- 4. PAGE 2: SEARCH RESULTS RENDERING & SORTING ---
+    async function selectAndLaunchVideoById(videoId) {
+      if (!videoId) return;
+      showToast("Loading companion lecture...");
+      try {
+        const res = await fetch(`${API_SERVER}/api/video-info?v=${encodeURIComponent(videoId)}`);
+        const data = await res.json();
+        const video = {
+          id: videoId,
+          title: data.title || `YouTube Video (${videoId})`,
+          channel: data.channel || 'Verified Creator',
+          url: `https://www.youtube.com/watch?v=${videoId}`,
+          embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3`,
+          thumbnail: data.thumbnail || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+          viewsText: "Verified",
+          likesText: "High Rating",
+          rating: 4.90
+        };
+        currentVideoList.unshift(video);
+        setActiveVideo(video);
+        launchStudyKitGeneration(video);
+      } catch (e) {
+        const v = currentVideoList.find(x => x.id === videoId) || catalogVideos.find(x => x.id === videoId) || {
+          id: videoId,
+          title: "YouTube Companion Lecture",
+          channel: "Verified Creator",
+          url: `https://www.youtube.com/watch?v=${videoId}`,
+          embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3`,
+          thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+          rating: 4.90
+        };
+        setActiveVideo(v);
+        launchStudyKitGeneration(v);
+      }
+    }
+
+    function selectAndLaunchVideo(idx) {
+      const video = currentVideoList[idx] || catalogVideos[0];
+      setActiveVideo(video);
+      launchStudyKitGeneration(video);
+    }
+
+    function renderSearchCards() {
+      const container = document.getElementById('full-video-cards-container');
+      if (!container) return;
+
+      container.innerHTML = currentVideoList.map((video, idx) => {
+        let rankBadgeClass = "bg-slate-200 text-slate-800 font-bold";
+        if (video.rank === 1) rankBadgeClass = "bg-amber-400 text-slate-950 font-black shadow-sm";
+        if (video.rank === 2) rankBadgeClass = "bg-slate-300 text-slate-900 font-extrabold";
+        if (video.rank === 3) rankBadgeClass = "bg-amber-600 text-white font-extrabold";
+
+        return `
+          <div class="p-5 bg-white rounded-2xl border border-[#E2E8F5] shadow-card hover:shadow-card-hover transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            
+            <!-- Video Info & Thumbnail -->
+            <div class="flex items-center gap-4 flex-1 min-w-0">
+              <div class="w-8 h-8 rounded-full ${rankBadgeClass} text-xs flex items-center justify-center flex-shrink-0">
+                ${video.rank}
+              </div>
+
+              <!-- Thumbnail with Play Overlay -->
+              <div class="relative w-28 sm:w-36 flex-shrink-0 rounded-xl overflow-hidden shadow-sm border border-slate-200 group cursor-pointer" style="aspect-ratio:16/9" onclick="selectAndLaunchVideo(${idx})">
+                ${video.thumbnail
+                  ? `<img src="${video.thumbnail}" alt="thumbnail" class="w-full h-full object-cover">`
+                  : `<div class="w-full h-full bg-slate-900 flex items-center justify-center"><span class="text-[9px] font-bold text-center px-1 text-slate-300 leading-snug">${video.thumbText || video.title.slice(0,30)}</span></div>`
+                }
+                <div class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/5 transition-colors">
+                  <div class="w-8 h-8 rounded-full bg-white/50 backdrop-blur-sm flex items-center justify-center shadow">
+                    <svg class="w-4 h-4 fill-white ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  </div>
+                </div>
+                ${video.duration ? `<span class="absolute bottom-1 right-1 text-[9px] font-bold bg-black/70 text-white px-1.5 py-0.5 rounded">${video.duration}</span>` : ''}
+              </div>
+
+              <!-- Title & Meta -->
+              <div class="min-w-0 flex-1 space-y-1">
+                <h3 class="text-sm sm:text-base font-extrabold text-[#10164A] truncate hover:text-[#4F46E5] transition-colors cursor-pointer" onclick="selectAndLaunchVideo(${idx})">
+                  ${video.title}
+                </h3>
+                <div class="text-xs text-slate-500 font-medium">${video.channel} • ${video.time}</div>
+                <div class="flex items-center gap-3 text-xs text-slate-400">
+                  <span>👁 ${video.viewsText} views</span>
+                  <span>•</span>
+                  <span>👍 ${video.likesText} likes</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Rating & Score Breakdown -->
+            <div class="flex items-center gap-6 flex-shrink-0 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
+              
+              <div class="text-left md:text-right">
+                <div class="text-base font-black text-amber-500 flex items-center md:justify-end gap-1">
+                  <span>⭐</span> ${video.rating}/5
+                </div>
+                <div class="text-[11px] text-slate-500 space-y-0.5 mt-0.5 font-medium">
+                  <div>• Sentiment: <span class="text-slate-800 font-bold">${video.sentiment}%</span></div>
+                  <div>• Relevance: <span class="text-slate-800 font-bold">${video.relevance}%</span></div>
+                  <div>• Recency: <span class="text-slate-800 font-bold">${video.recency}%</span></div>
+                </div>
+              </div>
+
+              <!-- Call to Action -->
+              <div class="flex flex-col items-end gap-1.5">
+                ${video.bestMatch ? `<span class="text-[10px] font-extrabold px-3 py-0.5 bg-indigo-100 text-indigo-700 rounded-full">Best Match</span>` : ''}
+                <button onclick="selectAndLaunchVideo(${idx})" class="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#4F46E5] to-[#6366F1] text-white text-xs font-bold shadow-brand hover:opacity-95 flex items-center gap-1.5 transition-all">
+                  <span>Generate Study Kit</span>
+                  <span>→</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    function sortVideoResults(type) {
+      ['rating', 'views', 'newest'].forEach(t => {
+        const btn = document.getElementById(`sort-btn-${t}`);
+        if (!btn) return;
+        if (t === type) {
+          btn.className = "px-3.5 py-1 rounded-full bg-[#4F46E5] text-white font-semibold flex items-center gap-1 shadow-sm";
+        } else {
+          btn.className = "px-3 py-1 rounded-full text-slate-600 hover:text-slate-900 font-medium";
+        }
+      });
+
+      if (type === 'rating') currentVideoList.sort((a, b) => b.rating - a.rating);
+      if (type === 'views') currentVideoList.sort((a, b) => b.views - a.views);
+      if (type === 'newest') currentVideoList.sort((a, b) => b.recency - a.recency);
+      renderSearchCards();
+      showToast(`Sorted by ${type.toUpperCase()}`);
+    }
+
+    // --- 5. PROGRESS PIPELINE & FULL-STACK AI MATERIALS GENERATION ---
+    let currentStudyMaterials = null;
+
+    function applyGeneratedMaterials(mat) {
+      if (!mat) return;
+      currentStudyMaterials = mat;
+      // Immediately update workspace dynamic notes with backend generated content
+      if (activeVideo) {
+        renderDynamicNotes(activeVideo, currentNotesSubtab);
+      }
+
+      // 1. Update Exam Topic Header
+      const topicEl = document.getElementById('p4-topic-badge');
+      if (topicEl && mat.topic) topicEl.innerText = mat.topic;
+
+      // 2. Update Exam Quizzes
+      if (mat.quizzes && mat.quizzes.length > 0) {
+        practiceQuizList = mat.quizzes.map((q, i) => ({
+          q: q.q,
+          diff: i === 0 ? "Easy" : (i === 1 ? "Medium" : "Hard"),
+          options: q.options,
+          correct: q.answer,
+          exp: q.explanation
+        }));
+        currentQIdx = 0;
+        renderQuestionCardP4();
+      }
+
+      // 3. Update Mind Map Central Node & Branches
+      if (mat.mind_map) {
+        const cn = document.getElementById('mindmap-central-node');
+        if (cn && mat.mind_map.central) cn.innerText = mat.mind_map.central;
+
+        if (mat.mind_map.branches) {
+          mat.mind_map.branches.forEach((b, idx) => {
+            const bEl = document.getElementById(`mindmap-branch-${idx + 1}`);
+            if (bEl) {
+              const bgColors = [
+                { bg: 'bg-sky-100', text: 'text-sky-800' },
+                { bg: 'bg-emerald-100', text: 'text-emerald-800' },
+                { bg: 'bg-orange-100', text: 'text-orange-800' },
+                { bg: 'bg-purple-100', text: 'text-purple-800' }
+              ];
+              const c = bgColors[idx] || bgColors[0];
+              bEl.innerHTML = `
+                <div class="px-3 py-1 rounded-lg ${c.bg} ${c.text} font-black text-sm mb-2 text-center">${b.title}</div>
+                <ul class="text-slate-700 space-y-1.5 ml-2 font-medium">
+                  ${b.items.map(it => `<li>◆ ${it}</li>`).join('')}
+                </ul>
+              `;
+            }
+          });
+        }
+      }
+
+      // 4. Update Resources (Books, Papers, Related Videos)
+      if (mat.resources) {
+        const booksCont = document.getElementById('p6-books-container');
+        if (booksCont && mat.resources.books) {
+          const bookThemes = [
+            { bg: 'bg-blue-600', border: 'border-blue-400' },
+            { bg: 'bg-slate-900', border: 'border-slate-700' },
+            { bg: 'bg-cyan-700', border: 'border-cyan-500' }
+          ];
+          booksCont.innerHTML = mat.resources.books.map((b, i) => {
+            const th = bookThemes[i % bookThemes.length];
+            return `
+              <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center text-center hover:shadow-card hover:-translate-y-1 transition-all">
+                <div class="w-28 h-36 ${th.bg} rounded-xl shadow-md mb-3 flex flex-col justify-center items-center text-white text-[10px] font-black p-2 leading-snug border-2 ${th.border}">
+                  <span>${b.title.toUpperCase()}</span>
+                </div>
+                <h4 class="text-sm font-extrabold text-[#10164A] mb-1">${b.title}</h4>
+                <span class="text-xs text-slate-500">by ${b.authors}</span>
+                <span class="text-[11px] text-indigo-600 font-semibold mt-2">${b.tag || 'Recommended'}</span>
+              </div>
+            `;
+          }).join('');
+          // Update subtitle dynamically
+          const booksSubtitle = document.getElementById('p6-books-subtitle');
+          if (booksSubtitle && mat.topic) {
+            booksSubtitle.innerText = `Authoritative reference books covering ${mat.topic}`;
+          }
+        }
+
+        
+        const relCont = document.getElementById('p6-related-videos-container');
+        if (relCont) {
+          if (mat.resources.related_videos && mat.resources.related_videos.length > 0) {
+            relCont.innerHTML = mat.resources.related_videos.map((rv) => `
+              <div onclick="selectAndLaunchVideoById('${rv.id}')" class="bg-slate-900 rounded-2xl p-4 text-white flex flex-col justify-between h-44 shadow-card hover:scale-105 transition-all cursor-pointer relative overflow-hidden group border border-slate-700">
+                <div class="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-40 transition-opacity" style="background-image: url('${rv.thumbnail}');"></div>
+                <div class="relative z-10 flex items-center justify-between">
+                  <span class="text-[10px] font-black px-2 py-0.5 bg-amber-400 text-slate-950 rounded-md">⭐ ${rv.rating}/5</span>
+                  <span class="text-xs text-slate-300 font-mono bg-black/50 px-2 py-0.5 rounded">${rv.duration || 'Lecture'}</span>
+                </div>
+                <div class="relative z-10">
+                  <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs mb-2 shadow-md group-hover:scale-110 transition-transform">▶</div>
+                  <h4 class="text-xs font-bold leading-snug line-clamp-2 text-white group-hover:text-amber-300 transition-colors">${rv.title}</h4>
+                  <p class="text-[11px] text-slate-400 mt-1">${rv.channel} • ${rv.viewsText} views</p>
+                </div>
+              </div>
+            `).join('');
+          } else {
+            relCont.innerHTML = `<div class="col-span-3 py-10 text-center text-slate-400 text-sm">▶️ No related videos found for this topic</div>`;
+          }
+        }
+
+        const papersCont = document.getElementById('p6-papers-container');
+        if (papersCont && mat.resources.papers) {
+          papersCont.innerHTML = mat.resources.papers.map((p, i) => `
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-4 hover:border-indigo-300 transition-colors">
+              <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl flex-shrink-0">📄</div>
+              <div>
+                <h4 class="text-sm font-bold text-[#10164A]">${p.title}</h4>
+                <p class="text-xs text-slate-500 mt-0.5">${p.publisher} • ${p.year}</p>
+              </div>
+            </div>
+          `).join('');
+
+          const papersSubtitle = document.getElementById('p6-papers-subtitle');
+          if (papersSubtitle && mat.topic) {
+            papersSubtitle.innerText = `Peer-reviewed literature and seminal papers for ${mat.topic}`;
+          }
+          const videosSubtitle = document.getElementById('p6-videos-subtitle');
+          if (videosSubtitle && mat.topic) {
+            videosSubtitle.innerText = `High-rated companion lectures and tutorials for ${mat.topic}`;
+          }
+        }
+      }
+    }
+
+    let isFetchingMaterials = false;
+    async function fetchAndApplyMaterials(video, force = false) {
+      if (!video) video = activeVideo;
+      if (!video) return;
+      if (!force && currentStudyMaterials && (currentStudyMaterials.videoId === video.id || currentStudyMaterials.topic === video.title)) {
+        applyGeneratedMaterials(currentStudyMaterials);
+        return;
+      }
+      if (isFetchingMaterials) return;
+      isFetchingMaterials = true;
+      try {
+        const res = await fetch(`${API_SERVER}/api/materials/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic: video.title || 'Operating Systems',
+            channel: video.channel || '',
+            videoId: video.id || ''
+          })
+        });
+        const data = await res.json();
+        if (data && data.materials) {
+          applyGeneratedMaterials(data.materials);
+        }
+      } catch (err) {
+        console.warn('Failed to fetch materials from backend:', err);
+      } finally {
+        isFetchingMaterials = false;
+      }
+    }
+
+    function launchStudyKitGeneration(videoOrTitle) {
+      let video = null;
+      let title = "Operating Systems & Computer Science";
+      if (typeof videoOrTitle === 'object' && videoOrTitle !== null) {
+        video = videoOrTitle;
+        title = video.title;
+      } else if (typeof videoOrTitle === 'string') {
+        title = videoOrTitle;
+        video = currentVideoList.find(v => v.title === title) || currentVideoList[0];
+      }
+
+      if (video) {
+        setActiveVideo(video);
+      }
+
+      const bannerTitle = document.getElementById('p7-banner-title');
+      if (bannerTitle) bannerTitle.innerText = title;
+      navigateTo('progress');
+
+      // Call Backend API: POST /api/materials/generate
+      fetch(`${API_SERVER}/api/materials/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic: video ? video.title : title,
+          channel: video ? video.channel : '',
+          videoId: video ? video.id : ''
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.materials) {
+          applyGeneratedMaterials(data.materials);
+        }
+      })
+      .catch(err => {
+        console.warn('Backend API connection notice:', err);
+      });
+
+      const fill = document.getElementById('p7-progress-fill');
+      const label = document.getElementById('p7-percentage-label');
+      const s2Icon = document.getElementById('p7-step2-icon');
+      const s3Icon = document.getElementById('p7-step3-icon');
+      const s3Title = document.getElementById('p7-step3-title');
+      const s3Desc = document.getElementById('p7-step3-desc');
+
+      // Step 1: initial 30%
+      if (fill) fill.style.width = '30%';
+      if (label) label.innerText = '30%';
+      if (s2Icon) { s2Icon.className = "w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-base font-black flex-shrink-0 mt-0.5 animate-spin"; s2Icon.innerText = "⚙"; }
+      if (s3Icon) { s3Icon.className = "w-8 h-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-base font-black flex-shrink-0 mt-0.5"; }
+      if (s3Title) s3Title.className = "text-base font-extrabold text-slate-400";
+
+      // Step 2: 70%
+      setTimeout(() => {
+        if (fill) fill.style.width = '70%';
+        if (label) label.innerText = '70%';
+        if (s2Icon) { s2Icon.className = "w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-base font-black flex-shrink-0 mt-0.5"; s2Icon.innerText = "✓"; }
+        if (s3Icon) { s3Icon.className = "w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-base font-black flex-shrink-0 mt-0.5 animate-spin"; s3Icon.innerText = "⚙"; }
+        if (s3Title) s3Title.className = "text-base font-extrabold text-[#10164A]";
+        if (s3Desc) s3Desc.className = "text-xs text-blue-600 font-semibold";
+      }, 1000);
+
+      // Step 3: 100% and auto-redirect
+      setTimeout(() => {
+        if (fill) fill.style.width = '100%';
+        if (label) label.innerText = '100%';
+        if (s3Icon) { s3Icon.className = "w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-base font-black flex-shrink-0 mt-0.5"; s3Icon.innerText = "✓"; }
+        if (s3Desc) s3Desc.innerText = "✔ Complete study kit synthesized!";
+        showToast("Study Kit ready! Opening Workspace...");
+        setTimeout(() => {
+          if (video) {
+            setActiveVideo(video);
+          }
+          navigateTo('workspace');
+        }, 700);
+      }, 2200);
+    }
+
+    // --- 6. PAGE 3: DYNAMIC STUDY NOTES MATCHING SELECTED VIDEO ---
+    function setP3NotesTab(subtab) {
+      currentNotesSubtab = subtab;
+      ['short', 'detailed', 'long'].forEach(st => {
+        const btn = document.getElementById(`p3-subtab-${st}`);
+        if (!btn) return;
+        if (st === subtab) {
+          btn.className = "px-4 py-1.5 rounded-full bg-[#EBF5FF] text-[#1D4ED8] text-xs font-bold transition-all";
+        } else {
+          btn.className = "px-4 py-1.5 rounded-full text-slate-600 hover:bg-slate-100 text-xs font-semibold transition-all";
+        }
+      });
+      renderDynamicNotes(activeVideo, subtab);
+    }
+
+    function renderDynamicNotes(video, subtab) {
+      const container = document.getElementById('p3-notes-container');
+      if (!container) return;
+
+      // Backend Connection: If study materials generated from backend exist, render them directly!
+      if (currentStudyMaterials) {
+        if (subtab === 'short' && currentStudyMaterials.short_notes) {
+          const sn = currentStudyMaterials.short_notes;
+          const points = Array.isArray(sn.points) ? sn.points.map((p, i) => {
+            const parts = p.split(':');
+            const h = parts.length > 1 ? parts[0] : ('Point ' + (i+1));
+            const b = parts.length > 1 ? parts.slice(1).join(':') : p;
+            return `<div class="space-y-1">
+              <h4 class="font-bold text-[#10164A] text-base">${i + 1}. ${h}</h4>
+              <p class="text-sm text-slate-600 ml-2">• ${b.trim()}</p>
+            </div>`;
+          }).join('') : '';
+
+          const keyConcept = sn.key_concept ? `
+            <div class="p-4 bg-amber-50 rounded-xl border border-amber-200/80 text-amber-900 flex items-start gap-3 shadow-subtle">
+              <span class="text-xl">💡</span>
+              <div>
+                <h5 class="font-bold text-amber-950 text-sm">Key Concept</h5>
+                <p class="text-xs text-amber-900 mt-0.5">${sn.key_concept}</p>
+              </div>
+            </div>` : '';
+
+          const codeBlock = sn.code ? `
+            <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-subtle">
+              <div class="px-4 py-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-slate-600 text-xs font-mono">
+                <span>${sn.code_title || 'Code / Algorithm Snippet:'}</span>
+                <button onclick="copySnippetCode()" class="hover:text-black flex items-center gap-1 font-sans font-bold"><span>📋</span> Copy</button>
+              </div>
+              <pre class="p-4 font-mono text-xs text-slate-800 leading-normal overflow-x-auto"><code>${sn.code}</code></pre>
+            </div>` : '';
+
+          container.innerHTML = `
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h3 class="text-lg font-black text-[#10164A]">${sn.title || 'AI Synthesized Short Notes'}</h3>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-[#4F46E5]">${(video && video.channel) || currentStudyMaterials.channel || 'VidAlzer Engine'}</span>
+            </div>
+            ${sn.summary ? `<p class="text-sm text-slate-700 font-medium bg-slate-50 p-3 rounded-xl border border-slate-200">${sn.summary}</p>` : ''}
+            ${points}
+            ${keyConcept}
+            ${codeBlock}
+          `;
+          return;
+        } else if (subtab === 'detailed' && currentStudyMaterials.detailed_notes) {
+          const dn = currentStudyMaterials.detailed_notes;
+          const secs = Array.isArray(dn.sections) ? dn.sections.map(s => `
+            <div class="space-y-2">
+              <h4 class="font-bold text-[#10164A] text-base">${s.heading}</h4>
+              <p class="text-sm text-slate-600 leading-relaxed">${s.body}</p>
+            </div>
+          `).join('') : '';
+
+          container.innerHTML = `
+            <h3 class="text-lg font-black text-[#10164A]">${dn.title || 'Detailed In-Depth Analysis'}</h3>
+            ${secs}
+          `;
+          return;
+        } else if (subtab === 'long' && currentStudyMaterials.long_notes) {
+          const ln = currentStudyMaterials.long_notes;
+          container.innerHTML = `
+            <h3 class="text-lg font-black text-[#10164A]">${ln.title || 'Comprehensive Reference & Theory'}</h3>
+            <p class="text-sm text-slate-600 leading-relaxed p-4 bg-slate-50 rounded-xl border border-slate-200">${ln.text || ''}</p>
+          `;
+          return;
+        }
+      }
+
+      const isOS = (video.channel && video.channel.includes("Gate Smashers")) || (video.title && video.title.toLowerCase().includes("operating system"));
+      const isDeadlock = (video.title && video.title.toLowerCase().includes("deadlock")) || (video.channel && video.channel.includes("Jenny"));
+
+      if (isOS) {
+        if (subtab === 'short') {
+          container.innerHTML = `
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h3 class="text-lg font-black text-[#10164A]">Operating Systems Core Notes</h3>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-[#4F46E5]">${video.channel}</span>
+            </div>
+            <div class="space-y-1">
+              <h4 class="font-bold text-[#10164A] text-base">1. OS Architecture & Kernel Space</h4>
+              <p class="text-sm text-slate-600 ml-2">• Dual-mode operation: User Mode (Mode bit 1) vs Kernel/Privileged Mode (Mode bit 0).</p>
+              <p class="text-sm text-slate-600 ml-2">• System calls act as the programmatic gateway for applications to request hardware services.</p>
+            </div>
+            <div class="space-y-1">
+              <h4 class="font-bold text-[#10164A] text-base">2. Process Lifecycle & PCB</h4>
+              <p class="text-sm text-slate-600 ml-2">• Process States: New &rarr; Ready &rarr; Running &rarr; Waiting &rarr; Terminated.</p>
+              <p class="text-sm text-slate-600 ml-2">• PCB holds PID, Program Counter, CPU registers, memory limits, and open file lists.</p>
+            </div>
+            <div class="space-y-1">
+              <h4 class="font-bold text-[#10164A] text-base">3. CPU Scheduling Primitives</h4>
+              <p class="text-sm text-slate-600 ml-2">• Algorithms: FCFS, SJF (Preemptive/Non-preemptive), Priority, and Round Robin (Time Quantum).</p>
+            </div>
+            <div class="p-4 bg-amber-50 rounded-xl border border-amber-200/80 text-amber-900 flex items-start gap-3 shadow-subtle">
+              <span class="text-xl">💡</span>
+              <div>
+                <h5 class="font-bold text-amber-950 text-sm">Key Concept</h5>
+                <p class="text-xs text-amber-900 mt-0.5">Context Switching is pure system overhead; during switching, the CPU performs no useful user work.</p>
+              </div>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-subtle">
+              <div class="px-4 py-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-slate-600 text-xs font-mono">
+                <span>C Process Creation (fork):</span>
+                <button onclick="copySnippetCode()" class="hover:text-black flex items-center gap-1 font-sans font-bold"><span>📋</span> Copy</button>
+              </div>
+              <pre class="p-4 font-mono text-xs text-slate-800 leading-normal"><code>1  #include &lt;stdio.h&gt;
+2  #include &lt;unistd.h&gt;
+3  int main() {
+4      pid_t pid = fork();
+5      if (pid == 0) printf("Child Process: PID=%d\\n", getpid());
+6      else printf("Parent Process: Child PID=%d\\n", pid);
+7      return 0;
+8  }</code></pre>
+            </div>
+          `;
+        } else if (subtab === 'detailed') {
+          container.innerHTML = `
+            <h3 class="text-lg font-black text-[#10164A]">Detailed In-Depth OS Notes</h3>
+            <div class="space-y-2">
+              <h4 class="font-bold text-[#10164A] text-base">1. Kernel Space vs User Space Separation</h4>
+              <p class="text-sm text-slate-600 leading-relaxed">Hardware registers enforce ring protection. Monolithic kernels (Linux) execute core services (networking, file system, memory management) within supervisor space for zero-overhead function calls, while Microkernels (Mach, QNX) run drivers in user space communicating via IPC message queues.</p>
+            </div>
+            <div class="space-y-2">
+              <h4 class="font-bold text-[#10164A] text-base">2. Process Control Block (PCB) Fields</h4>
+              <p class="text-sm text-slate-600 leading-relaxed">A PCB represents a process in operating system memory. It encompasses Pointer to parent/child, Process State, Program Counter, CPU registers, CPU Scheduling information (priority, queue pointers), Memory-management information (page tables), Accounting info, and I/O status.</p>
+            </div>
+          `;
+        } else {
+          container.innerHTML = `
+            <h3 class="text-lg font-black text-[#10164A]">Long Structured Textbook Reference</h3>
+            <p class="text-xs text-slate-500 font-mono">Silberschatz, Galvin &amp; Gagne — Operating System Concepts (Chapter 3: Processes)</p>
+            <div class="space-y-3 pt-2 text-sm text-slate-700 leading-relaxed">
+              <p><strong>3.1 Process Concept:</strong> A process is more than the program code (text section). It also includes the current activity (program counter, contents of registers), the stack (temporary data such as function parameters, return addresses, local variables), the data section (global variables), and the heap (dynamically allocated memory during runtime).</p>
+              <p><strong>3.2 Process Scheduling:</strong> The objective of multiprogramming is to have some process running at all times to maximize CPU utilization. The objective of time sharing is to switch the CPU among processes so frequently that users can interact with each program while it is running.</p>
+            </div>
+          `;
+        }
+      } else if (isDeadlock) {
+        if (subtab === 'short') {
+          container.innerHTML = `
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h3 class="text-lg font-black text-[#10164A]">Deadlock &amp; RAG Notes</h3>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700">${video.channel}</span>
+            </div>
+            <div class="space-y-1">
+              <h4 class="font-bold text-[#10164A] text-base">1. 4 Coffman Necessary Conditions</h4>
+              <ul class="list-disc list-inside text-slate-600 text-sm space-y-1 ml-2">
+                <li><strong>Mutual Exclusion:</strong> At least one resource is held in non-shareable mode.</li>
+                <li><strong>Hold &amp; Wait:</strong> A process holds resources while waiting for additional ones.</li>
+                <li><strong>No Preemption:</strong> Resources can only be released voluntarily.</li>
+                <li><strong>Circular Wait:</strong> A closed chain of processes each waiting for resource held by next.</li>
+              </ul>
+            </div>
+            <div class="space-y-1">
+              <h4 class="font-bold text-[#10164A] text-base">2. Resource Allocation Graph (RAG)</h4>
+              <p class="text-sm text-slate-600 ml-2">• <strong>Request Edge:</strong> Process P<sub>i</sub> &rarr; Resource R<sub>j</sub> (directed from process to resource).</p>
+              <p class="text-sm text-slate-600 ml-2">• <strong>Assignment Edge:</strong> Resource R<sub>j</sub> &rarr; Process P<sub>i</sub> (directed from instance dot to process).</p>
+            </div>
+            <div class="p-4 bg-amber-50 rounded-xl border border-amber-200/80 text-amber-900 flex items-start gap-3 shadow-subtle">
+              <span class="text-xl">💡</span>
+              <div>
+                <h5 class="font-bold text-amber-950 text-sm">Theorem</h5>
+                <p class="text-xs text-amber-900 mt-0.5">If a RAG contains no cycles, no deadlock exists. If every resource type has exactly one instance, a cycle is necessary and sufficient for deadlock.</p>
+              </div>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-subtle">
+              <div class="px-4 py-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-slate-600 text-xs font-mono">
+                <span>Cycle Detection DFS:</span>
+                <button onclick="copySnippetCode()" class="hover:text-black flex items-center gap-1 font-sans font-bold"><span>📋</span> Copy</button>
+              </div>
+              <pre class="p-4 font-mono text-xs text-slate-800 leading-normal"><code>1  def has_deadlock_cycle(graph, node, visited, stack):
+2      visited[node] = stack[node] = True
+3      for neighbor in graph.get(node, []):
+4          if not visited[neighbor]:
+5              if has_deadlock_cycle(graph, neighbor, visited, stack): return True
+6          elif stack[neighbor]: return True
+7      stack[node] = False
+8      return False</code></pre>
+            </div>
+          `;
+        } else {
+          container.innerHTML = `
+            <h3 class="text-lg font-black text-[#10164A]">Detailed Deadlock Analysis &amp; Banker's Algorithm</h3>
+            <div class="space-y-2">
+              <h4 class="font-bold text-[#10164A] text-base">1. Banker's Algorithm Safety Formula</h4>
+              <p class="text-sm text-slate-600 leading-relaxed">Let Available[m] be free resources, Max[n][m] maximum demand, Allocation[n][m] current allocations, and Need[n][m] = Max[n][m] - Allocation[n][m]. The system is in a Safe State if there exists an execution sequence &lt;P<sub>0</sub>, P<sub>1</sub>, ..., P<sub>n-1</sub>&gt; such that for each process, Need<sub>i</sub> &le; Available + &sum; Allocation<sub>j</sub>.</p>
+            </div>
+          `;
+        }
+      } else {
+        if (subtab === 'short') {
+          container.innerHTML = `
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h3 class="text-lg font-black text-[#10164A]">Data Structures &amp; Algorithms Notes</h3>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700">${video.channel}</span>
+            </div>
+            <div class="space-y-1">
+              <h4 class="font-bold text-[#10164A] text-base">1. Binary Search Tree (BST) Properties</h4>
+              <p class="text-sm text-slate-600 ml-2">• For every node X: all keys in left subtree &lt; X.val, all keys in right subtree &gt; X.val.</p>
+              <p class="text-sm text-slate-600 ml-2">• Time complexity: O(log n) average search/insert/delete; O(n) worst-case in degenerate trees.</p>
+            </div>
+            <div class="space-y-1">
+              <h4 class="font-bold text-[#10164A] text-base">2. Traversal Orders</h4>
+              <p class="text-sm text-slate-600 ml-2">• Inorder: Left &rarr; Root &rarr; Right (Yields keys in strictly sorted ascending order).</p>
+              <p class="text-sm text-slate-600 ml-2">• Preorder: Root &rarr; Left &rarr; Right | Postorder: Left &rarr; Right &rarr; Root.</p>
+            </div>
+            <div class="p-4 bg-amber-50 rounded-xl border border-amber-200/80 text-amber-900 flex items-start gap-3 shadow-subtle">
+              <span class="text-xl">💡</span>
+              <div>
+                <h5 class="font-bold text-amber-950 text-sm">Key Concept</h5>
+                <p class="text-xs text-amber-900 mt-0.5">Inorder traversal of any valid BST produces an array sorted in monotonic ascending order.</p>
+              </div>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-subtle">
+              <div class="px-4 py-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-slate-600 text-xs font-mono">
+                <span>Inorder Traversal:</span>
+                <button onclick="copySnippetCode()" class="hover:text-black flex items-center gap-1 font-sans font-bold"><span>📋</span> Copy</button>
+              </div>
+              <pre class="p-4 font-mono text-xs text-slate-800 leading-normal"><code>1  def inorder(root):
+2      if root:
+3          inorder(root.left)
+4          print(root.val)
+5          inorder(root.right)</code></pre>
+            </div>
+          `;
+        } else {
+          container.innerHTML = `
+            <h3 class="text-lg font-black text-[#10164A]">Detailed In-Depth Algorithm Notes</h3>
+            <div class="space-y-2">
+              <h4 class="font-bold text-[#10164A] text-base">1. Asymptotic Complexity Classes</h4>
+              <p class="text-sm text-slate-600 leading-relaxed">O(1) Constant &lt; O(log n) Logarithmic &lt; O(n) Linear &lt; O(n log n) Linearithmic &lt; O(n<sup>2</sup>) Quadratic &lt; O(2<sup>n</sup>) Exponential.</p>
+            </div>
+          `;
+        }
+      }
+    }
+
+    // --- 7. PAGE 4: EXAM & PRACTICE QUIZZES ---
+    const practiceQuizList = [
+      {
+        q: "What is the time complexity of search operation in a balanced BST?",
+        diff: "Medium",
+        options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+        correct: 1,
+        exp: "In a balanced BST, tree height is strictly bounded by log2(n). Because each comparison cuts down the remaining candidates by half, lookup requires logarithmic O(log n) time."
+      },
+      {
+        q: "Which traversal of a Binary Search Tree produces elements in non-decreasing sorted order?",
+        diff: "Easy",
+        options: ["Preorder Traversal", "Inorder Traversal", "Postorder Traversal", "Level-order Traversal"],
+        correct: 1,
+        exp: "Inorder traversal visits Left Subtree -> Root -> Right Subtree. Since Left < Root < Right, it outputs all keys in strictly ascending sorted order."
+      },
+      {
+        q: "In BST deletion, what replaces a node having two non-empty children?",
+        diff: "Hard",
+        options: ["Root of the tree", "Inorder Successor or Predecessor", "Any random leaf node", "Leftmost node of left subtree"],
+        correct: 1,
+        exp: "Replacing with either the Inorder Successor (smallest key in right subtree) or Inorder Predecessor preserves all binary search tree invariants."
+      }
+    ];
+
+    let currentQIdx = 0;
+
+    function renderQuestionCardP4() {
+      const q = practiceQuizList[currentQIdx];
+      document.getElementById('p4-question-counter').innerText = `Q${currentQIdx + 1} of ${practiceQuizList.length}`;
+      document.getElementById('p4-diff-badge').innerText = q.diff;
+      document.getElementById('p4-question-title').innerText = q.q;
+
+      const optsCont = document.getElementById('p4-options-container');
+      optsCont.innerHTML = q.options.map((opt, i) => `
+        <label class="flex items-center gap-3 p-4 rounded-xl ${i === q.correct ? 'bg-indigo-50 border-2 border-indigo-300 text-[#1D4ED8] font-bold' : 'bg-slate-50 border border-slate-200 text-slate-800 font-medium'} cursor-pointer hover:bg-indigo-50/50 transition-colors">
+          <input type="radio" name="p4_quiz_opt" value="${i}" ${i === q.correct ? 'checked' : ''} class="w-4 h-4 text-[#4F46E5] focus:ring-0">
+          <span class="text-sm">${opt}</span>
+        </label>
+      `).join('');
+
+      document.getElementById('p4-answer-panel').classList.add('hidden');
+      document.getElementById('p4-answer-toggle-text').innerText = "Show Answer ∨";
+      document.getElementById('p4-answer-panel').innerHTML = `
+        <span class="font-extrabold text-sm text-emerald-900">Correct Answer: ${q.options[q.correct]}</span>
+        <p class="mt-1">${q.exp}</p>
+      `;
+    }
+
+    function toggleAnswerP4() {
+      const panel = document.getElementById('p4-answer-panel');
+      const text = document.getElementById('p4-answer-toggle-text');
+      if (panel.classList.contains('hidden')) {
+        panel.classList.remove('hidden');
+        text.innerText = "Hide Answer ∧";
+      } else {
+        panel.classList.add('hidden');
+        text.innerText = "Show Answer ∨";
+      }
+    }
+
+    function nextQuestionP4() {
+      if (currentQIdx < practiceQuizList.length - 1) {
+        currentQIdx++;
+        renderQuestionCardP4();
+      } else {
+        showToast("Practice session completed! Great job! 🎉");
+      }
+    }
+
+    function prevQuestionP4() {
+      if (currentQIdx > 0) {
+        currentQIdx--;
+        renderQuestionCardP4();
+      }
+    }
+
+    function setExamSubcategory(cat) {
+      ['qb', 'practice', 'pyq', 'gate'].forEach(c => {
+        const btn = document.getElementById(`p4-tab-${c}`);
+        if (!btn) return;
+        if (c === cat) {
+          btn.className = "px-4 py-1.5 rounded-full bg-[#EBF5FF] text-[#1D4ED8] text-xs font-bold";
+        } else {
+          btn.className = "px-4 py-1.5 rounded-full text-slate-600 hover:bg-slate-100 text-xs font-medium";
+        }
+      });
+      showToast(`Viewing: ${cat.toUpperCase()}`);
+    }
+
+    function setExamDifficulty(diff) {
+      ['all', 'easy', 'medium', 'hard'].forEach(d => {
+        const btn = document.getElementById(`diff-p4-${d}`);
+        if (!btn) return;
+        if (d === diff) {
+          btn.className = "px-3.5 py-1 rounded-full bg-[#4F46E5] text-white text-xs font-bold";
+        } else {
+          btn.className = "px-3 py-1 rounded-full text-slate-600 hover:bg-slate-100 text-xs font-medium";
+        }
+      });
+    }
+
+    // --- 8. PAGE 5: FULL MIND MAP CONTROLS ---
+    let fullMindMapZoom = 1;
+    function zoomMindMapFull(factor) {
+      fullMindMapZoom = Math.min(Math.max(fullMindMapZoom * factor, 0.6), 1.8);
+      document.getElementById('mindmap-full-viewport').style.transform = `scale(${fullMindMapZoom})`;
+    }
+    function resetMindMapFull() {
+      fullMindMapZoom = 1;
+      document.getElementById('mindmap-full-viewport').style.transform = `scale(1)`;
+    }
+
+    // --- 9. UTILITIES: TOAST, PDF, COPY, TXT ---
+    function showToast(message, icon = "✅") {
+      const toast = document.getElementById('global-toast');
+      document.getElementById('global-toast-msg').innerText = message;
+      document.getElementById('global-toast-icon').innerText = icon;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    function copySnippetCode() {
+      navigator.clipboard.writeText("def inorder(root):\n    if root:\n        inorder(root.left)\n        print(root.val)\n        inorder(root.right)");
+      showToast("Code snippet copied to clipboard! 📋");
+    }
+
+    function copyCurrentNotes() {
+      const text = document.getElementById('p3-notes-container').innerText;
+      navigator.clipboard.writeText(text);
+      showToast("All study notes copied to clipboard! 📋");
+    }
+
+    function downloadAsTXT() {
+      const text = `VIDALZER AI STUDY NOTES\n\n` + document.getElementById('p3-notes-container').innerText;
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `VidAlzer_Study_Notes.txt`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast("Downloaded VidAlzer_Study_Notes.txt ⬇");
+    }
+
+    function exportToPDF() {
+      showToast("Preparing printable study document... 📥");
+      setTimeout(() => {
+        window.print();
+      }, 400);
+    }
+
+    function handleSaveAction() {
+      showToast("Workspace progress saved to local storage! 💾");
+    }
+
+    function handleShareAction() {
+      navigator.clipboard.writeText(window.location.href);
+      showToast("Shareable link copied to clipboard! ↗");
+    }
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSearchCards();
+      renderQuestionCardP4();
+      fetchAndApplyMaterials(activeVideo);
+    });
+  </script>
+</body>
+</html>
