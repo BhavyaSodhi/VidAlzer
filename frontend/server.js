@@ -1265,6 +1265,18 @@ class ${cleanTitle.replace(/[^a-zA-Z0-9]/g, '') || 'SystemModule'}:
 // 3. FULL-STACK HTTP SERVER & ROUTER
 // ---------------------------------------------------------------------------
 function handleRequest(req, res) {
+  // Universal CORS Headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   const parsedUrl = new URL(req.url, 'http://' + (req.headers.host || 'localhost'));
   const pathname = parsedUrl.pathname;
 
