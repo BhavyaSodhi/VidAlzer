@@ -279,7 +279,7 @@
                   <div class="absolute left-4 top-3.5 text-slate-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                   </div>
-                  <input id="landing-search-query" type="text" value="Operating Systems – Deadlocks" placeholder="e.g. Operating Systems – Deadlocks, Binary Search Trees..." class="w-full pl-12 pr-4 py-3 bg-white border border-[#CBD5E1] rounded-full text-sm text-[#10164A] font-medium focus:outline-none focus:border-[#4F46E5] shadow-sm">
+                  <input id="landing-search-query" onkeydown="if(event.key==='Enter') handleExecuteTopicSearch();" type="text" value="" placeholder="Search any topic: e.g. Python, React, Binary Search Trees, DBMS..." class="w-full pl-12 pr-4 py-3 bg-white border border-[#CBD5E1] rounded-full text-sm text-[#10164A] font-medium focus:outline-none focus:border-[#4F46E5] shadow-sm">
                 </div>
                 <button onclick="handleExecuteTopicSearch()" class="px-7 py-3 bg-gradient-to-r from-[#4F46E5] to-[#6366F1] text-white text-sm font-bold rounded-full shadow-brand hover:opacity-95 flex items-center justify-center gap-2 whitespace-nowrap">
                   <span>Find Best Videos</span>
@@ -910,31 +910,9 @@
           </div>
 
           <div id="p6-books-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center text-center hover:shadow-card hover:-translate-y-1 transition-all">
-              <div class="w-28 h-36 bg-blue-600 rounded-xl shadow-md mb-3 flex flex-col justify-center items-center text-white text-[10px] font-black p-2 leading-snug border-2 border-blue-400">
-                <span>OPERATING SYSTEM CONCEPTS</span>
-              </div>
-              <h4 class="text-sm font-extrabold text-[#10164A] mb-1">Operating System Concepts (10th Ed)</h4>
-              <span class="text-xs text-slate-500">by Silberschatz, Galvin &amp; Gagne</span>
-              <span class="text-[11px] text-indigo-600 font-semibold mt-2">Primary Textbook</span>
-            </div>
-
-            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center text-center hover:shadow-card hover:-translate-y-1 transition-all">
-              <div class="w-28 h-36 bg-slate-900 rounded-xl shadow-md mb-3 flex flex-col justify-center items-center text-white text-[10px] font-black p-2 leading-snug border-2 border-slate-700">
-                <span>MODERN OPERATING SYSTEMS</span>
-              </div>
-              <h4 class="text-sm font-extrabold text-[#10164A] mb-1">Modern Operating Systems (4th Ed)</h4>
-              <span class="text-xs text-slate-500">by Andrew S. Tanenbaum</span>
-              <span class="text-[11px] text-indigo-600 font-semibold mt-2">Reference Book</span>
-            </div>
-
-            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center text-center hover:shadow-card hover:-translate-y-1 transition-all">
-              <div class="w-28 h-36 bg-cyan-700 rounded-xl shadow-md mb-3 flex flex-col justify-center items-center text-white text-[10px] font-black p-2 leading-snug border-2 border-cyan-500">
-                <span>OPERATING SYSTEMS: THREE EASY PIECES</span>
-              </div>
-              <h4 class="text-sm font-extrabold text-[#10164A] mb-1">Operating Systems: Three Easy Pieces</h4>
-              <span class="text-xs text-slate-500">by Remzi &amp; Andrea Arpaci-Dusseau</span>
-              <span class="text-[11px] text-indigo-600 font-semibold mt-2">Modern Practical Guide</span>
+            <div class="col-span-full py-10 text-center text-slate-400 text-sm flex flex-col items-center gap-2">
+              <span class="text-3xl">📚</span>
+              <span>Generate a study kit to see topic-specific recommended books</span>
             </div>
           </div>
         </div>
@@ -946,26 +924,15 @@
               <h3 class="text-xl font-black text-[#10164A] flex items-center gap-2">
                 <span>📑</span> Academic Research Papers
               </h3>
-              <p id="p6-papers-subtitle" class="text-xs text-slate-500">Peer-reviewed literature and seminal papers on Deadlock &amp; Concurrency</p>
+              <p id="p6-papers-subtitle" class="text-xs text-slate-500">Peer-reviewed literature and seminal algorithm papers</p>
             </div>
             <a href="#" onclick="showToast('Connecting to IEEE repository... 📄')" class="text-xs font-bold text-[#4F46E5] hover:underline flex items-center gap-1">View All Papers →</a>
           </div>
 
           <div id="p6-papers-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-4 hover:border-indigo-300 transition-colors">
-              <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl flex-shrink-0">📄</div>
-              <div>
-                <h4 class="text-sm font-bold text-[#10164A]">System Deadlocks — Formal Foundations &amp; Graph Models</h4>
-                <p class="text-xs text-slate-500 mt-0.5">ACM Computing Surveys • Classic Paper</p>
-              </div>
-            </div>
-
-            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-4 hover:border-indigo-300 transition-colors">
-              <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl flex-shrink-0">📄</div>
-              <div>
-                <h4 class="text-sm font-bold text-[#10164A]">Deadlock Detection in Distributed Systems</h4>
-                <p class="text-xs text-slate-500 mt-0.5">IEEE Transactions on Software Engineering • IEEE Archive</p>
-              </div>
+            <div class="col-span-full py-10 text-center text-slate-400 text-sm flex flex-col items-center gap-2">
+              <span class="text-3xl">📄</span>
+              <span>Generate a study kit to see topic-specific research papers</span>
             </div>
           </div>
         </div>
@@ -977,49 +944,15 @@
               <h3 class="text-xl font-black text-[#10164A] flex items-center gap-2">
                 <span>▶️</span> Related Video Lectures
               </h3>
-              <p id="p6-videos-subtitle" class="text-xs text-slate-500">Selected high-rating companion lectures on Deadlock &amp; Operating Systems</p>
+              <p id="p6-videos-subtitle" class="text-xs text-slate-500">Selected high-rating companion lectures for your topic</p>
             </div>
             <a href="#" onclick="showToast('Loading related video catalog... ▶')" class="text-xs font-bold text-[#4F46E5] hover:underline flex items-center gap-1">View All Videos →</a>
           </div>
 
           <div id="p6-related-videos-container" class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div onclick="selectAndLaunchVideoById('s1wpXfrbZMo')" class="bg-slate-900 rounded-2xl p-4 text-white flex flex-col justify-between h-44 shadow-card hover:scale-105 transition-all cursor-pointer relative overflow-hidden group border border-slate-700">
-              <div class="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-40 transition-opacity" style="background-image: url('https://img.youtube.com/vi/s1wpXfrbZMo/hqdefault.jpg');"></div>
-              <div class="relative z-10 flex items-center justify-between">
-                <span class="text-[10px] font-black px-2 py-0.5 bg-amber-400 text-slate-950 rounded-md">⭐ 4.72/5</span>
-                <span class="text-xs text-slate-300 font-mono bg-black/50 px-2 py-0.5 rounded">24:49</span>
-              </div>
-              <div class="relative z-10">
-                <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs mb-2 shadow-md group-hover:scale-110 transition-transform">▶</div>
-                <h4 class="text-xs font-bold leading-snug line-clamp-2 text-white group-hover:text-amber-300 transition-colors">L-4.4: Deadlock Handling Methods and Deadlock Prevention</h4>
-                <p class="text-[11px] text-slate-400 mt-1">Gate Smashers • 2.1M views</p>
-              </div>
-            </div>
-
-            <div onclick="selectAndLaunchVideoById('OnpQTqAlGKg')" class="bg-slate-900 rounded-2xl p-4 text-white flex flex-col justify-between h-44 shadow-card hover:scale-105 transition-all cursor-pointer relative overflow-hidden group border border-slate-700">
-              <div class="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-40 transition-opacity" style="background-image: url('https://img.youtube.com/vi/OnpQTqAlGKg/hqdefault.jpg');"></div>
-              <div class="relative z-10 flex items-center justify-between">
-                <span class="text-[10px] font-black px-2 py-0.5 bg-amber-400 text-slate-950 rounded-md">⭐ 4.70/5</span>
-                <span class="text-xs text-slate-300 font-mono bg-black/50 px-2 py-0.5 rounded">19:33</span>
-              </div>
-              <div class="relative z-10">
-                <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs mb-2 shadow-md group-hover:scale-110 transition-transform">▶</div>
-                <h4 class="text-xs font-bold leading-snug line-clamp-2 text-white group-hover:text-amber-300 transition-colors">Deadlock in Operating System | Deadlock Detection and Recovery</h4>
-                <p class="text-[11px] text-slate-400 mt-1">Neso Academy • 1.8M views</p>
-              </div>
-            </div>
-
-            <div onclick="selectAndLaunchVideoById('o3aqkOvgNW0')" class="bg-slate-900 rounded-2xl p-4 text-white flex flex-col justify-between h-44 shadow-card hover:scale-105 transition-all cursor-pointer relative overflow-hidden group border border-slate-700">
-              <div class="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-40 transition-opacity" style="background-image: url('https://img.youtube.com/vi/o3aqkOvgNW0/hqdefault.jpg');"></div>
-              <div class="relative z-10 flex items-center justify-between">
-                <span class="text-[10px] font-black px-2 py-0.5 bg-amber-400 text-slate-950 rounded-md">⭐ 4.70/5</span>
-                <span class="text-xs text-slate-300 font-mono bg-black/50 px-2 py-0.5 rounded">22:11</span>
-              </div>
-              <div class="relative z-10">
-                <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs mb-2 shadow-md group-hover:scale-110 transition-transform">▶</div>
-                <h4 class="text-xs font-bold leading-snug line-clamp-2 text-white group-hover:text-amber-300 transition-colors">Banker's Algorithm in Operating System | Deadlock Avoidance</h4>
-                <p class="text-[11px] text-slate-400 mt-1">Gate Smashers • 1.7M views</p>
-              </div>
+            <div class="col-span-3 py-10 text-center text-slate-400 text-sm flex flex-col items-center gap-2">
+              <span class="text-3xl">▶️</span>
+              <span>Generate a study kit to see topic-specific related videos</span>
             </div>
           </div>
         </div>
@@ -1325,7 +1258,7 @@
 
     // ─── REAL YOUTUBE API FETCH ──────────────────────────────────────
     // Set your API Key here OR start api-server.js on port 3002
-    const API_SERVER = '';
+    const API_SERVER = 'http://localhost:3000';
 
     async function fetchRealVideos(query) {
       const container = document.getElementById('full-video-cards-container');
@@ -1549,6 +1482,7 @@
 
     function selectAndLaunchVideo(idx) {
       const video = currentVideoList[idx] || catalogVideos[0];
+      currentStudyMaterials = null;
       setActiveVideo(video);
       launchStudyKitGeneration(video);
     }
